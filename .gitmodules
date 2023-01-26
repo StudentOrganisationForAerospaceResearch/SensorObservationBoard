@@ -1,0 +1,3 @@
+[submodule "AvionicsSoftware"]
+	path = AvionicsSoftware
+	url = https://github.com/StudentOrganisationForAerospaceResearch/AvionicsSoftware.git
