@@ -40,6 +40,11 @@ constexpr uint16_t FLIGHT_TASK_STACK_DEPTH_WORDS = 256;		// Size of the flight t
 
 constexpr uint16_t FLIGHT_PHASE_DISPLAY_FREQ = 1000;	// Display frequency for flight phase information
 
+// IR Task
+constexpr uint8_t IR_TASK_RTOS_PRIORITY = 2;			// Priority of the IR task
+constexpr uint8_t IR_TASK_QUEUE_DEPTH_OBJS = 10;		// Size of the IR task queue
+constexpr uint16_t IR_TASK_STACK_DEPTH_WORDS = 256;		// Size of the IR task stack
+
 // UART TASK
 constexpr uint8_t UART_TASK_RTOS_PRIORITY = 2;			// Priority of the uart task
 constexpr uint8_t UART_TASK_QUEUE_DEPTH_OBJS = 10;		// Size of the uart task queue
