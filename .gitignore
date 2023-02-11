@@ -20,6 +20,9 @@
 *.so.*
 *.dylib
 
+# mac dstore
+**/.DS_Store
+
 # Executables
 build/
 *.exe
