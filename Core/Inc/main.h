@@ -49,8 +49,6 @@ extern "C" {
 
 /* USER CODE END EM */
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -59,34 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define BATT_SENSE_ADC_Pin GPIO_PIN_0
-#define BATT_SENSE_ADC_GPIO_Port GPIOC
-#define PMB_CONTROL_Pin GPIO_PIN_1
-#define PMB_CONTROL_GPIO_Port GPIOC
-#define AUX_2_Pin GPIO_PIN_2
-#define AUX_2_GPIO_Port GPIOC
-#define AUX_1_Pin GPIO_PIN_3
-#define AUX_1_GPIO_Port GPIOC
 #define RADIO_UART_TX_Pin GPIO_PIN_2
 #define RADIO_UART_TX_GPIO_Port GPIOA
 #define RADIO_UART_RX_Pin GPIO_PIN_3
 #define RADIO_UART_RX_GPIO_Port GPIOA
-#define IMU_CS_Pin GPIO_PIN_4
-#define IMU_CS_GPIO_Port GPIOA
-#define IMU_SPI_SCK_Pin GPIO_PIN_5
-#define IMU_SPI_SCK_GPIO_Port GPIOA
-#define IMU_SPI_MISO_Pin GPIO_PIN_6
-#define IMU_SPI_MISO_GPIO_Port GPIOA
-#define IMU_SPI_MOSI_Pin GPIO_PIN_7
-#define IMU_SPI_MOSI_GPIO_Port GPIOA
-#define MAG_CS_Pin GPIO_PIN_4
-#define MAG_CS_GPIO_Port GPIOC
-#define SPI_FLASH_SCK_Pin GPIO_PIN_13
-#define SPI_FLASH_SCK_GPIO_Port GPIOB
-#define SPI_FLASH_MISO_Pin GPIO_PIN_14
-#define SPI_FLASH_MISO_GPIO_Port GPIOB
-#define SPI_FLASH_MOSI_Pin GPIO_PIN_15
-#define SPI_FLASH_MOSI_GPIO_Port GPIOB
 #define LED_1_Pin GPIO_PIN_12
 #define LED_1_GPIO_Port GPIOD
 #define LED_2_Pin GPIO_PIN_14
@@ -97,26 +71,12 @@ void Error_Handler(void);
 #define DEBUG_UART_TX_GPIO_Port GPIOC
 #define DEBUG_UART_RX_Pin GPIO_PIN_7
 #define DEBUG_UART_RX_GPIO_Port GPIOC
-#define LAUNCH_Pin GPIO_PIN_8
-#define LAUNCH_GPIO_Port GPIOA
 #define GPS_UART_TX_Pin GPIO_PIN_9
 #define GPS_UART_TX_GPIO_Port GPIOA
 #define GPS_UART_RX_Pin GPIO_PIN_10
 #define GPS_UART_RX_GPIO_Port GPIOA
-#define BUZZER_PWM_Pin GPIO_PIN_15
-#define BUZZER_PWM_GPIO_Port GPIOA
-#define BARO_SPI_SCK_Pin GPIO_PIN_10
-#define BARO_SPI_SCK_GPIO_Port GPIOC
-#define BARO_SPI_MISO_Pin GPIO_PIN_11
-#define BARO_SPI_MISO_GPIO_Port GPIOC
-#define BARO_CS_Pin GPIO_PIN_4
-#define BARO_CS_GPIO_Port GPIOB
-#define BARO_SPI_MOSI_Pin GPIO_PIN_5
-#define BARO_SPI_MOSI_GPIO_Port GPIOB
 #define MEM_WP_Pin GPIO_PIN_6
 #define MEM_WP_GPIO_Port GPIOB
-#define SPI_FLASH_CS_Pin GPIO_PIN_7
-#define SPI_FLASH_CS_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
