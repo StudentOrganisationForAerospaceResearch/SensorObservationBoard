@@ -8,6 +8,7 @@
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
 
+
 /**
  * @brief Constructor for FlightTask
  */
@@ -46,7 +47,12 @@ void LoadCellTask::Run(void * pvParams)
     while (1) {
 
         //Every cycle, print something out (for testing)
+    	InitializeLoadCell(Clk_pin_GPIO_Port, Clk_pin_Pin , Data_pin_GPIO_Port, Data_pin_Pin);
+    	CalibrateLoadCell();
+    	float weightReading = SampleLoadCellData();
+
         SOAR_PRINT("LoadCellTask::Run() - [%d] Seconds\n", tempSecondCounter++);
+        SOAR_PRINT("LoadCell reading: [%d]\n", weightReading);
 
     }
 }
@@ -103,7 +109,29 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
     }
 }
 
-void LoadCellTask::SampleLoadCellData()
+void LoadCellTask::InitializeLoadCell(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin)
 {
+	hx711_init(&loadcell,clk_gpio , clk_pin ,dat_gpio, dat_pin);
+}
 
+void LoadCellTask::CalibrateLoadCell()
+{
+	SOAR_PRINT("No mass should be on the Load Cell");
+	hx711_tare(&loadcell, 10);
+	int32_t value_noload = hx711_value_ave(&loadcell,10);
+
+	HAL_Delay(500);
+
+	SOAR_PRINT("Apply a known mass to the Load Cell");
+	int32_t value_loadraw = hx711_value_ave(&loadcell, 10);
+
+
+	hx711_calibration(&loadcell, value_noload, value_loadraw, knownmass);
+}
+
+
+float LoadCellTask::SampleLoadCellData()
+{
+	float measuredWeight = hx711_weight(&loadcell, 10);
+	return measuredWeight;
 }
