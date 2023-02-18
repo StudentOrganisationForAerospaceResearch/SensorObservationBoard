@@ -9,6 +9,7 @@
 #include "SystemDefines.hpp"
 #include "../../Drivers/mlx90614 Driver/mlx90614.h"
 
+
 /**
  * @brief Constructor for IRTask
  */
@@ -41,68 +42,71 @@ void IRTask::InitTask()
  */
 void IRTask::Run(void * pvParams)
 {
-    uint32_t tempSecondCounter = 0; // TODO: Temporary counter, would normally be in HeartBeat task or HID Task, unless FlightTask is the HeartBeat task
-    I2C_HandleTypeDef hi2c1;
-    GPIO::LED1::Off();
 
     while (1) {
-        // There's effectively 3 types of tasks... 'Async' and 'Synchronous-Blocking' and 'Synchronous-Non-Blocking'
-        // Asynchronous tasks don't require a fixed-delay and can simply delay using xQueueReceive, it will immedietly run the next task
-        // cycle as soon as it gets an event.
 
-        // Synchronous-Non-Blocking tasks require a fixed-delay and will require something like an RTOS timer that tracks the time till the next run cycle,
-        // and will delay using xQueueReceive for the set time, but if it gets interrupted by an event will handle the event then restart a xQueueReceive with
-        // the time remaining in the timer
 
-        // Synchronous-Blocking tasks are simpler to implement, they do NOT require instant handling of queue events, and will simply delay using osDelay() and
-        // poll the event queue once every cycle.
-
-        // This task below with the display would be a 'Synchronous-Non-Blocking' we want to handle queue events instantly, but keep a fixed delay
-        // Could consider a universal queue that directs and handles commands to specific tasks, and a task that handles the queue events and then calls the
-        // Mappings between X command and P subscribers (tasks that are expecting it).
-
-        // Since FlightTask is so critical to managing the system, it may make sense to make this a Async task that handles commands as they come in, and have these display commands be routed over to the DisplayTask
-        // or maybe HID (Human Interface Device) task that handles both updating buzzer frequencies and LED states.
-        GPIO::LED1::On();
-        osDelay(500);
-        GPIO::LED1::Off();
-        osDelay(500);
-
-        float tempReading = MLX90614_ReadTemp(hi2c1,0x5A,0x05);
+        float tempReading = MLX90614_ReadTemp(hi2c1,0x5A,0x07);
+        int temp =  static_cast<int>(tempReading);
         //Every cycle, print something out (for testing)
-        SOAR_PRINT("Temperature reading: [%d]\n", tempReading );
-        SOAR_PRINT("IRTask::Run() - [%d] Seconds\n", tempSecondCounter++);
+        SOAR_PRINT("Temperature reading: [%d]\n", temp );
+        //SOAR_PRINT("IRTask::Run() - [%d] Seconds\n", tempSecondCounter++);
 
-        //osDelay(FLIGHT_PHASE_DISPLAY_FREQ);
-
-        //// Half the buzzer frequency for flight phase beeps
-        //// (slightly less important, and only a bit quieter)
-        //htim2.Init.Prescaler = ((htim2.Init.Prescaler + 1) * 2) - 1;
-        //if (HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-        //    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-        //    osDelay(BUZZER_ERR_PERIOD);
-        //    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
-        //}
-
-        //// Beep n times for flight phase n, and blink LED 1
-        //for (int i = -1; i < getCurrentFlightPhase(); i++) {
-        //    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-        //    HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, 1);
-        //    osDelay(FLIGHT_PHASE_BLINK_FREQ);
-
-        //    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
-        //    HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, 0);
-        //    osDelay(FLIGHT_PHASE_BLINK_FREQ);
-        //}
-
-        //// Return the buzzer to its optimal frequency for message beeps
-        //htim2.Init.Prescaler = ((htim2.Init.Prescaler + 1) / 2) - 1;
-        //if (HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-        //    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-        //    osDelay(BUZZER_ERR_PERIOD);
-        //    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
-        //}
-
-        // TODO: Message beeps
     }
+}
+
+/**
+ * @brief Handles a command
+ * @param cm Command reference to handle
+ */
+void IRTask::HandleCommand(Command& cm)
+{
+    //TODO: Since this task will stall for a few milliseconds, we may need a way to eat the whole queue (combine similar eg. REQUEST commands and eat to WDG command etc)
+    //TODO: Maybe a HandleEvtQueue instead that takes in the whole queue and eats the whole thing in order of non-blocking to blocking
+
+    //Switch for the GLOBAL_COMMAND
+    switch (cm.GetCommand()) {
+    case REQUEST_COMMAND: {
+        HandleRequestCommand(cm.GetTaskCommand());
+    }
+    case TASK_SPECIFIC_COMMAND: {
+        break;
+    }
+    default:
+        SOAR_PRINT("IRTask - Received Unsupported Command {%d}\n", cm.GetCommand());
+        break;
+    }
+
+    //No matter what we happens, we must reset allocated data
+    cm.Reset();
+}
+
+
+/**
+ * @brief Handles a Request Command
+ * @param taskCommand The command to handle
+ */
+void IRTask::HandleRequestCommand(uint16_t taskCommand)
+{
+    //Switch for task specific command within DATA_COMMAND
+    switch (taskCommand) {
+    case IR_REQUEST_NEW_SAMPLE:
+    	SampleIRTemperature();
+        break;
+    case IR_REQUEST_TRANSMIT:
+        SOAR_PRINT("Stubbed: IR task transmit not implemented\n");
+        break;
+    case IR_REQUEST_DEBUG:
+        SOAR_PRINT("\t-- IR Data --\n");
+        SOAR_PRINT(" Temp (C)       : %d.%d\n", 10,10);
+        break;
+    default:
+        SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
+        break;
+    }
+}
+
+void IRTask::SampleIRTemperature()
+{
+
 }

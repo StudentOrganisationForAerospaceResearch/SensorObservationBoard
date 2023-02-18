@@ -8,6 +8,18 @@
 #define SOAR_IRTASK_HPP_
 #include "Task.hpp"
 #include "SystemDefines.hpp"
+#include "../../Drivers/mlx90614 Driver/mlx90614.h"
+
+
+/* Macros/Enums ------------------------------------------------------------*/
+enum IR_TASK_COMMANDS {
+    IR_NONE = 0,
+    IR_REQUEST_NEW_SAMPLE,// Get a new barometer sample, task will be blocked for polling time
+    IR_REQUEST_TRANSMIT,    // Send the current barometer data over the Radio
+    IR_REQUEST_DEBUG        // Send the current barometer data over the Debug UART
+};
+
+
 class IRTask : public Task
 {
 public:
@@ -22,6 +34,11 @@ protected:
     static void RunTask(void* pvParams) { IRTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
 
     void Run(void * pvParams); // Main run code
+    void HandleCommand(Command& cm);
+    void HandleRequestCommand(uint16_t taskCommand);
+
+    void SampleIRTemperature();
+
 
 
 private:
