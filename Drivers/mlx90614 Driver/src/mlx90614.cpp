@@ -120,6 +120,7 @@ float MLX90614_ReadTemp(I2C_HandleTypeDef hi2c, uint8_t devAddr, uint8_t regAddr
 	return temp;
 }
 
+/*
 void MLX90614_ScanDevices (I2C_HandleTypeDef hi2c) {
 	HAL_StatusTypeDef result;
 	for (int i = 0; i<128; i++)
@@ -137,7 +138,7 @@ void MLX90614_ScanDevices (I2C_HandleTypeDef hi2c) {
 
 			  }
 		  }
-}
+}*/
 /*
 void MLX90614_SendDebugMsg(uint8_t op_type, uint8_t devAddr, uint8_t regAddr, uint16_t data, uint8_t crc_in, uint8_t crc_calc) {
 	if(op_type == MLX90614_DBG_MSG_W) {

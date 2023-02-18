@@ -52,6 +52,6 @@ uint8_t CRC8_Calc(uint8_t*, const uint8_t);
 void MLX90614_WriteReg(I2C_HandleTypeDef hic21, uint8_t sa, uint8_t reg, uint16_t size);
 uint16_t MLX90614_ReadReg(I2C_HandleTypeDef hic21, uint8_t sa, uint8_t reg, uint8_t size);
 float MLX90614_ReadTemp(I2C_HandleTypeDef hic21, uint8_t sa, uint8_t reg);
-void MLX90614_ScanDevices (I2C_HandleTypeDef hic21);
+//void MLX90614_ScanDevices (I2C_HandleTypeDef hic21);
 //void MLX90614_SendDebugMsg(uint8_t, uint8_t, uint8_t, uint16_t, uint8_t, uint8_t);
 
