@@ -61,6 +61,10 @@ void Error_Handler(void);
 #define RADIO_UART_TX_GPIO_Port GPIOA
 #define RADIO_UART_RX_Pin GPIO_PIN_3
 #define RADIO_UART_RX_GPIO_Port GPIOA
+#define Clk_pin_Pin GPIO_PIN_9
+#define Clk_pin_GPIO_Port GPIOD
+#define Data_pin_Pin GPIO_PIN_10
+#define Data_pin_GPIO_Port GPIOD
 #define LED_1_Pin GPIO_PIN_12
 #define LED_1_GPIO_Port GPIOD
 #define LED_2_Pin GPIO_PIN_14

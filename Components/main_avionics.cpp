@@ -11,6 +11,7 @@
 #include "SystemDefines.hpp"
 #include "main_avionics.hpp"
 #include "stm32f4xx_hal_uart.h"
+#include "../../Drivers/mlx90614 Driver/mlx90614.h"
 #include "Mutex.hpp"
 #include "Command.hpp"
 
@@ -18,6 +19,7 @@
 #include "UARTTask.hpp"
 #include "FlightTask.hpp"
 #include "DebugTask.hpp"
+#include "IRTask.hpp"
 
 
 /* Global Variables ------------------------------------------------------------------*/
@@ -32,6 +34,8 @@ void run_main() {
 	FlightTask::Inst().InitTask();
 	UARTTask::Inst().InitTask();
 	DebugTask::Inst().InitTask();
+	IRTask::Inst().InitTask();
+
 
 	// Print System Boot Info : Warning, don't queue more than 10 prints before scheduler starts
 	SOAR_PRINT("\n-- AVIONICS CORE --\n");
