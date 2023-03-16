@@ -41,19 +41,14 @@ void LoadCellTask::InitTask()
  */
 void LoadCellTask::Run(void * pvParams)
 {
-    uint32_t tempSecondCounter = 0; // TODO: Temporary counter, would normally be in HeartBeat task or HID Task, unless FlightTask is the HeartBeat task
-
 
     while (1) {
-
-        //Every cycle, print something out (for testing)
-    	InitializeLoadCell(Clk_pin_GPIO_Port, Clk_pin_Pin , Data_pin_GPIO_Port, Data_pin_Pin);
-    	CalibrateLoadCell();
-    	float weightReading = SampleLoadCellData();
-
-        SOAR_PRINT("LoadCellTask::Run() - [%d] Seconds\n", tempSecondCounter++);
-        SOAR_PRINT("LoadCell reading: [%d]\n", weightReading);
-
+    	Command cm(REQUEST_COMMAND, LOADCELL_REQUEST_CALLIBRATION);
+        HandleCommand(cm);
+        Command cm2(REQUEST_COMMAND,LOADCELL_REQUEST_NEW_SAMPLE);
+        HandleCommand(cm2);
+        Command cm3(REQUEST_COMMAND, LOADCELL_REQUEST_TRANSMIT);
+        HandleCommand(cm3);
     }
 }
 
@@ -93,6 +88,8 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
 {
     //Switch for task specific command within DATA_COMMAND
     switch (taskCommand) {
+    case LOADCELL_REQUEST_CALLIBRATION:
+    	CalibrateLoadCell(Clk_pin_GPIO_Port, Clk_pin_Pin , Data_pin_GPIO_Port, Data_pin_Pin);
     case LOADCELL_REQUEST_NEW_SAMPLE:
     	SampleLoadCellData();
         break;
@@ -100,8 +97,7 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
         SOAR_PRINT("Stubbed: LoadCell task transmit not implemented\n");
         break;
     case LOADCELL_REQUEST_DEBUG:
-        SOAR_PRINT("\t-- LoadCell Data --\n");
-        SOAR_PRINT(" LoadCell Data       : %d.%d\n", 10,10);
+        SOAR_PRINT(" LoadCell Data: %d\n", measuredWeight);
         break;
     default:
         SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
@@ -109,13 +105,10 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
     }
 }
 
-void LoadCellTask::InitializeLoadCell(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin)
+void LoadCellTask::CalibrateLoadCell(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin)
 {
 	hx711_init(&loadcell,clk_gpio , clk_pin ,dat_gpio, dat_pin);
-}
 
-void LoadCellTask::CalibrateLoadCell()
-{
 	SOAR_PRINT("No mass should be on the Load Cell");
 	hx711_tare(&loadcell, 10);
 	int32_t value_noload = hx711_value_ave(&loadcell,10);
@@ -130,8 +123,8 @@ void LoadCellTask::CalibrateLoadCell()
 }
 
 
-float LoadCellTask::SampleLoadCellData()
+void LoadCellTask::SampleLoadCellData()
 {
-	float measuredWeight = hx711_weight(&loadcell, 10);
-	return measuredWeight;
+	measuredWeight = hx711_weight(&loadcell, 10);
+
 }

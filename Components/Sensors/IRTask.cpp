@@ -6,8 +6,10 @@
 */
 #include "IRTask.hpp"
 #include "GPIO.hpp"
+#include <time.h>
 #include "SystemDefines.hpp"
 #include "../../Drivers/mlx90614 Driver/mlx90614.h"
+
 
 
 /**
@@ -42,16 +44,12 @@ void IRTask::InitTask()
  */
 void IRTask::Run(void * pvParams)
 {
-
     while (1) {
 
-
-        float tempReading = MLX90614_ReadTemp(hi2c1,0x5A,0x07);
-        int temp =  static_cast<int>(tempReading);
-        //Every cycle, print something out (for testing)
-        SOAR_PRINT("Temperature reading: [%d]\n", temp );
-        //SOAR_PRINT("IRTask::Run() - [%d] Seconds\n", tempSecondCounter++);
-
+    	Command cm(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE);
+    	HandleCommand(cm);
+    	Command cm2(REQUEST_COMMAND,IR_REQUEST_DEBUG);
+        HandleCommand(cm2);
     }
 }
 
@@ -76,7 +74,6 @@ void IRTask::HandleCommand(Command& cm)
         SOAR_PRINT("IRTask - Received Unsupported Command {%d}\n", cm.GetCommand());
         break;
     }
-
     //No matter what we happens, we must reset allocated data
     cm.Reset();
 }
@@ -96,10 +93,14 @@ void IRTask::HandleRequestCommand(uint16_t taskCommand)
     case IR_REQUEST_TRANSMIT:
         SOAR_PRINT("Stubbed: IR task transmit not implemented\n");
         break;
-    case IR_REQUEST_DEBUG:
-        SOAR_PRINT("\t-- IR Data --\n");
-        SOAR_PRINT(" Temp (C)       : %d.%d\n", 10,10);
+    case IR_REQUEST_DEBUG: {
+        SOAR_PRINT("|IR_TASK| Object Temp: %d, Ambient Temp: %d, MCU Timestamp: %u\n", static_cast<int>(objectTemp * 100),
+        static_cast<int>(ambientTemp * 100),timestampIR);
         break;
+    }
+    case IR_REQUEST_TIMESTAMP:
+    	SOAR_PRINT("MCU Timestamp: %u",timestampIR);
+    	break;
     default:
         SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
         break;
@@ -108,5 +109,7 @@ void IRTask::HandleRequestCommand(uint16_t taskCommand)
 
 void IRTask::SampleIRTemperature()
 {
-
+	objectTemp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TOBJ1);
+	ambientTemp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TAMB);
+	timestampIR = HAL_GetTick();
 }
