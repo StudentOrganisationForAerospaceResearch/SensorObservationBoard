@@ -79,6 +79,10 @@ void Error_Handler(void);
 #define GPS_UART_TX_GPIO_Port GPIOA
 #define GPS_UART_RX_Pin GPIO_PIN_10
 #define GPS_UART_RX_GPIO_Port GPIOA
+#define CS_Pin GPIO_PIN_4
+#define CS_GPIO_Port GPIOB
+#define CS1_Pin GPIO_PIN_5
+#define CS1_GPIO_Port GPIOB
 #define MEM_WP_Pin GPIO_PIN_6
 #define MEM_WP_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */

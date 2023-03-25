@@ -7,6 +7,9 @@
 #include <Sensors/Inc/ThermocoupleTask.hpp>
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
+#include "main.h"
+#include "DebugTask.hpp"
+#include "Task.hpp"
 
 
 /**
@@ -43,15 +46,18 @@ void ThermocoupleTask::Run(void * pvParams)
 {
     uint32_t tempSecondCounter = 0; // TODO: Temporary counter, would normally be in HeartBeat task or HID Task, unless FlightTask is the HeartBeat task
 
-
     while (1) {
+            Command cm;
 
+            //Wait forever for a command
+            qEvtQueue->ReceiveWait(cm);
 
+            //Process the command
+            HandleCommand(cm);
 
-        //Every cycle, print something out (for testing)
-        SOAR_PRINT("ThermocoupleTask::Run() - [%d] Seconds\n", tempSecondCounter++);
-
-    }
+            //Every cycle, print something out (for testing)
+            SOAR_PRINT("ThermocoupleTask::Run() - [%d] Seconds\n", tempSecondCounter++);
+        }
 }
 
 /**
@@ -90,14 +96,14 @@ void ThermocoupleTask::HandleRequestCommand(uint16_t taskCommand)
     //Switch for task specific command within DATA_COMMAND
     switch (taskCommand) {
     case THERMOCOUPLE_REQUEST_NEW_SAMPLE:
-    	SampleThermocoupleData();
+    	SampleThermocouple();
         break;
     case THERMOCOUPLE_REQUEST_TRANSMIT:
         SOAR_PRINT("Stubbed: Thermocouple task transmit not implemented\n");
         break;
     case THERMOCOUPLE_REQUEST_DEBUG:
         SOAR_PRINT("\t-- Thermocouple Data --\n");
-        SOAR_PRINT(" Thermocouple Data       : %d.%d\n", 10,10);
+        ThermocoupleTask::SampleThermocouple();
         break;
     default:
         SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
@@ -105,7 +111,143 @@ void ThermocoupleTask::HandleRequestCommand(uint16_t taskCommand)
     }
 }
 
-void ThermocoupleTask::SampleThermocoupleData()
+void ThermocoupleTask::SampleThermocouple()
 {
+	/*DATA FROM MAX31855KASA+T ------------------------------------------------------
+
+	32 bits Memory Map
+
+		D31-D18 : Thermocoupler Temperature Data
+
+			D31 : Sign bit
+
+			D30-D18 : Temperature Value (2's complement) from 2^10 to 2^-2
+
+		D17 : Reserved Bit
+
+		D16 : Fault (if high shows fault is detected, more specific fault messages at D2 - D0)
+
+		D15-D4 :  Internal Temperature Data (reference junction temperature)
+
+			D15 : Sign bit
+
+			D14-D4 : Temperature Value (2's complement) from 2^6 to 2^-4
+
+		D3 : Reserved
+
+		D2-D0 : Fault Detection Bits
+
+			D2 : SCV Fault (displays high if TC shorts to Vcc)
+
+			D1 : SCG Fault (displays high if TC shorts to GND)
+
+			D0 : Thermocouple has no Connection (displays high)
+
+	*///------------------------------------------------------------------------------
+
+
+	//Storable Data ------------------------------------------------------------------------------
+
+	uint8_t dataBuffer1[4];
+	//See Above bit mem-map
+
+	uint8_t Error1=0;// Thermocouple Connection acknowledge Flag
+	uint32_t sign1=0;
+	int Temp1=0;
+
+	//Read ---------------------------------------------------------------------------------------
+
+    //Read From Thermocouple 1 first
+	HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET); //begin read with CS pin low
+	HAL_SPI_Receive(SystemHandles::SPI_Thermocouple, dataBuffer1, 4, 1000); //Fill the data buffer with data from TC1
+	HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET); //end read with setting CS pin to high again
+
+	SOAR_PRINT("------------1-------------\n");
+
+	for(int i = 0; i<4; i++){
+		SOAR_PRINT("databufferTC1[%d] are: %d\n",i, dataBuffer1[i]);
+	}
+	SOAR_PRINT("\n");
+
+
+	double temp_debug_1 = 0;
+
+	Error1=dataBuffer1[3]&0x07;								  // Error Detection
+	sign1=(dataBuffer1[0]&(0x80))>>7;							  // Sign Bit calculation
+
+	if(dataBuffer1[3] & 0x07){								  // Returns Error Number
+		temp_debug_1 = (-1*(dataBuffer1[3] & 0x07));
+	}
+	else if(sign1==1){									  // Negative Temperature
+		Temp1 = (dataBuffer1[0] << 6) | (dataBuffer1[1] >> 2);
+		Temp1&=0b01111111111111;
+		Temp1^=0b01111111111111;
+		temp_debug_1 = (double)-Temp1/4;
+	}
+	else												  // Positive Temperature
+	{
+		Temp1 = (dataBuffer1[0] << 6) | (dataBuffer1[1] >> 2);
+		temp_debug_1 = ((double)Temp1 / 4);
+	}
+
+	temp_debug_1 = temp_debug_1*100;
+	SOAR_PRINT(
+				"\t-- The new Temp as big number say its read by TC1 is %d \n"
+				, (int)temp_debug_1);
+
+	SOAR_PRINT("\t-- The new Temp say its read by TC1 is %d.%d C \n"
+			"-------------------------\n", (int)temp_debug_1/100, (uint8_t)(int)temp_debug_1%100);
+
+
+
+	uint8_t dataBuffer2[4];
+	//See Above bit mem-map
+
+	uint8_t Error2=0;// Thermocouple Connection acknowledge Flag
+	uint32_t sign2=0;
+	int Temp2=0;
+
+	//Read ---------------------------------------------------------------------------------------
+
+	//Read From Thermocouple 1 first
+	HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_RESET); //begin read with CS pin low
+	HAL_SPI_Receive(SystemHandles::SPI_Thermocouple, dataBuffer2, 4, 1000); //Fill the data buffer with data from TC1
+	HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_SET); //end read with setting CS pin to high again
+
+
+	SOAR_PRINT("------------2-------------\n");
+
+	for(int i = 0; i<4; i++){
+		SOAR_PRINT("databufferTC2[%d] are: %d\n",i, dataBuffer2[i]);
+	}
+	SOAR_PRINT("\n");
+
+
+	double temp_debug_2 = 0;
+
+	Error2=dataBuffer2[3]&0x07;								  // Error Detection
+	sign2=(dataBuffer2[0]&(0x80))>>7;							  // Sign Bit calculation
+
+	if(dataBuffer2[3] & 0x07){								  // Returns Error Number
+		temp_debug_2 = (-1*(dataBuffer2[3] & 0x07));
+	}
+	else if(sign2==1){									  // Negative Temperature
+		Temp2 = (dataBuffer2[0] << 6) | (dataBuffer2[1] >> 2);
+		Temp2&=0b01111111111111;
+		Temp2^=0b01111111111111;
+		temp_debug_2 = (double)-Temp2/4;
+	}
+	else												  // Positive Temperature
+	{
+		Temp2 = (dataBuffer2[0] << 6) | (dataBuffer2[1] >> 2);
+		temp_debug_2 = ((double)Temp2 / 4);
+	}
+
+	temp_debug_2 = temp_debug_2*100;
+	SOAR_PRINT(
+				"\tThe new Temp as big number say its read by TC2 is %d \n", (int)temp_debug_2);
+
+	SOAR_PRINT("\tThe new Temp say its read by TC2 is %d.%d C \n"
+			"-------------------------\n", (int)temp_debug_2/100, (uint8_t)(int)temp_debug_2%100);
 
 }
