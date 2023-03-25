@@ -14,7 +14,9 @@
 /* Macros/Enums ------------------------------------------------------------*/
 enum LOADCELL_TASK_COMMANDS {
     LOADCELL_NONE = 0,
-	LOADCELL_REQUEST_CALLIBRATION,
+	LOADCELL_REQUEST_INIT,
+	LOADCELL_REQUEST_TARE,
+	LOADCELL_REQUEST_CALIBRATE,
     LOADCELL_REQUEST_NEW_SAMPLE,// Get a new load cell sample, task will be blocked for polling time
     LOADCELL_REQUEST_TRANSMIT,    // Send the current load cell data over the Radio
     LOADCELL_REQUEST_DEBUG        // Send the current load cell data over the Debug UART
@@ -41,9 +43,14 @@ protected:
     void HandleRequestCommand(uint16_t taskCommand);
 
     void SampleLoadCellData();
-    void CalibrateLoadCell(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin);
+   // void CalibrateLoadCell(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin);
+    void LoadCellInit(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin);
+    void LoadCellTare();
+    void LoadCellCalibrate();
     hx711_t loadcell;
-    float knownmass;
+    float knownmass = 25;
+    int32_t value_noload;
+    int32_t value_loadraw;
     float measuredWeight;
 
 

@@ -42,13 +42,14 @@ void LoadCellTask::InitTask()
 void LoadCellTask::Run(void * pvParams)
 {
 
+	Command cm(REQUEST_COMMAND, LOADCELL_REQUEST_INIT);
+	HandleCommand(cm);
     while (1) {
-    	Command cm(REQUEST_COMMAND, LOADCELL_REQUEST_CALLIBRATION);
-        HandleCommand(cm);
-        Command cm2(REQUEST_COMMAND,LOADCELL_REQUEST_NEW_SAMPLE);
-        HandleCommand(cm2);
-        Command cm3(REQUEST_COMMAND, LOADCELL_REQUEST_TRANSMIT);
-        HandleCommand(cm3);
+
+    	HAL_Delay(500);
+    	Command cm1(REQUEST_COMMAND, LOADCELL_REQUEST_TARE);
+    	HandleCommand(cm1);
+
     }
 }
 
@@ -88,8 +89,15 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
 {
     //Switch for task specific command within DATA_COMMAND
     switch (taskCommand) {
-    case LOADCELL_REQUEST_CALLIBRATION:
-    	CalibrateLoadCell(Clk_pin_GPIO_Port, Clk_pin_Pin , Data_pin_GPIO_Port, Data_pin_Pin);
+    case LOADCELL_REQUEST_INIT:
+    	LoadCellInit(Clk_pin_GPIO_Port, Clk_pin_Pin , Data_pin_GPIO_Port, Data_pin_Pin);
+    	break;
+    case LOADCELL_REQUEST_TARE:
+    	LoadCellTare();
+    	break;
+    case LOADCELL_REQUEST_CALIBRATE:
+    	LoadCellCalibrate();
+    	break;
     case LOADCELL_REQUEST_NEW_SAMPLE:
     	SampleLoadCellData();
         break;
@@ -105,20 +113,28 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
     }
 }
 
-void LoadCellTask::CalibrateLoadCell(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin)
+void LoadCellTask::LoadCellInit(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin)
 {
 	hx711_init(&loadcell,clk_gpio , clk_pin ,dat_gpio, dat_pin);
+}
 
+void LoadCellTask::LoadCellTare()
+{
 	SOAR_PRINT("No mass should be on the Load Cell");
 	hx711_tare(&loadcell, 10);
-	int32_t value_noload = hx711_value_ave(&loadcell,10);
+	SOAR_PRINT("Tare ADC value %d", loadcell.offset);
+	HAL_Delay(50);
+	value_noload = hx711_value_ave(&loadcell,10);
+	value_noload = 10;
+	SOAR_PRINT("Average ADC value %d", value_noload);
+	HAL_Delay(50);
 
-	HAL_Delay(500);
+}
 
+void LoadCellTask::LoadCellCalibrate()
+{
 	SOAR_PRINT("Apply a known mass to the Load Cell");
-	int32_t value_loadraw = hx711_value_ave(&loadcell, 10);
-
-
+	value_loadraw = hx711_value_ave(&loadcell, 10);
 	hx711_calibration(&loadcell, value_noload, value_loadraw, knownmass);
 }
 
