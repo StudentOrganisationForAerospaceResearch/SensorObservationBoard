@@ -95,6 +95,9 @@ constexpr uint16_t ASSERT_SEND_MAX_TIME_MS = 250;		// Max time the assert fail i
 constexpr uint16_t ASSERT_TAKE_MAX_TIME_MS = 500;		// Max time in ms to take the assert semaphore
 constexpr UART_HandleTypeDef* const DEFAULT_ASSERT_UART_HANDLE = SystemHandles::UART_Debug;	// UART Handle that ASSERT messages are sent over
 
+// DELAY
+constexpr uint16_t IR_DELAY_MS = 10;
+
 /* System Functions ------------------------------------------------------------------*/
 //- Any system functions with an implementation here should be inline, and inline for a good reason (performance)
 //- Otherwise the function may have a better place in main_avionics.cpp

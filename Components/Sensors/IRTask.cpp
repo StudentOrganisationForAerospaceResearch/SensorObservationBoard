@@ -48,6 +48,7 @@ void IRTask::Run(void * pvParams)
 
     	Command cm(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE);
     	HandleCommand(cm);
+    	HAL_Delay(IR_DELAY_MS);
     	Command cm2(REQUEST_COMMAND,IR_REQUEST_DEBUG);
         HandleCommand(cm2);
     }

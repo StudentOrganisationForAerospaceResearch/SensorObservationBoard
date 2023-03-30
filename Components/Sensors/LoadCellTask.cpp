@@ -90,7 +90,7 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
     //Switch for task specific command within DATA_COMMAND
     switch (taskCommand) {
     case LOADCELL_REQUEST_INIT:
-    	LoadCellInit(Clk_pin_GPIO_Port, Clk_pin_Pin , Data_pin_GPIO_Port, Data_pin_Pin);
+    	LoadCellInit(Clk_GPIO_Port, Clk_Pin , Data_GPIO_Port, Data_Pin);
     	break;
     case LOADCELL_REQUEST_TARE:
     	LoadCellTare();
@@ -125,7 +125,6 @@ void LoadCellTask::LoadCellTare()
 	SOAR_PRINT("Tare ADC value %d", loadcell.offset);
 	HAL_Delay(50);
 	value_noload = hx711_value_ave(&loadcell,10);
-	value_noload = 10;
 	SOAR_PRINT("Average ADC value %d", value_noload);
 	HAL_Delay(50);
 
