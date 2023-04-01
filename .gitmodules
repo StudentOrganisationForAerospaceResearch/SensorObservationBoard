@@ -1,6 +1,3 @@
 [submodule "AvionicsSoftware"]
 	path = AvionicsSoftware
 	url = https://github.com/StudentOrganisationForAerospaceResearch/AvionicsSoftware.git
-[submodule "Components/SoarProto"]
-	path = Components/SoarProto
-	url = https://github.com/StudentOrganisationForAerospaceResearch/SoarProto.git
