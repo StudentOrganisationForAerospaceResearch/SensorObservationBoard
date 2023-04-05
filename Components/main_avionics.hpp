@@ -33,7 +33,7 @@ namespace Global
 extern UART_HandleTypeDef huart1;   // UART1 - Launch Systems  ... Confirm
 extern UART_HandleTypeDef huart2;   // UART2 - Logging (Radio)
 extern UART_HandleTypeDef huart4;   // UART4 - GPS
-extern UART_HandleTypeDef huart6;   // UART6 - Debug
+extern UART_HandleTypeDef huart5;   // UART5 - Debug
 
 
 //I2C Handles
@@ -53,7 +53,7 @@ namespace SystemHandles {
 	constexpr UART_HandleTypeDef* UART_LaunchSystems = &huart1;
 	constexpr UART_HandleTypeDef* UART_Radio = &huart2;
 	constexpr UART_HandleTypeDef* UART_GPS = &huart4;
-	constexpr UART_HandleTypeDef* UART_Debug = &huart6;
+	constexpr UART_HandleTypeDef* UART_Debug = &huart5;
 
 	constexpr I2C_HandleTypeDef* I2C_IR = &hi2c1;
 

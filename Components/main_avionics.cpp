@@ -20,6 +20,7 @@
 #include "FlightTask.hpp"
 #include "DebugTask.hpp"
 #include "IRTask.hpp"
+#include "LoadCellTask.hpp"
 
 
 /* Global Variables ------------------------------------------------------------------*/
@@ -31,10 +32,9 @@ Mutex Global::vaListMutex;
 */
 void run_main() {
 	// Init Tasks
-	FlightTask::Inst().InitTask();
+	LoadCellTask::Inst().InitTask();
 	UARTTask::Inst().InitTask();
 	DebugTask::Inst().InitTask();
-	IRTask::Inst().InitTask();
 
 
 	// Print System Boot Info : Warning, don't queue more than 10 prints before scheduler starts
