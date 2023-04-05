@@ -65,10 +65,10 @@ void Error_Handler(void);
 #define Clk_pin_GPIO_Port GPIOA
 #define Data_pin_Pin GPIO_PIN_5
 #define Data_pin_GPIO_Port GPIOA
-#define DEBUG_UART_TX_Pin GPIO_PIN_6
-#define DEBUG_UART_TX_GPIO_Port GPIOC
-#define DEBUG_UART_RX_Pin GPIO_PIN_7
-#define DEBUG_UART_RX_GPIO_Port GPIOC
+#define LC_CLK_Pin GPIO_PIN_6
+#define LC_CLK_GPIO_Port GPIOA
+#define DAT_Pin GPIO_PIN_8
+#define DAT_GPIO_Port GPIOC
 #define GPS_UART_TX_Pin GPIO_PIN_9
 #define GPS_UART_TX_GPIO_Port GPIOA
 #define GPS_UART_RX_Pin GPIO_PIN_10
