@@ -12,6 +12,7 @@
 #include <cstring>
 
 #include "FlightTask.hpp"
+#include "LoadCellTask.hpp"
 #include "GPIO.hpp"
 #include "stm32f4xx_hal.h"
 
@@ -117,6 +118,26 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		SOAR_PRINT("Debug 'LED blink' command requested\n");
 		GPIO::LED1::On();
 		// TODO: Send to HID task to blink LED, this shouldn't delay
+	}
+
+	else if (strcmp(msg, "LCInit") == 0) {
+			SOAR_PRINT("Debug 'Load Cell Init' command requested\n");
+			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_INIT));
+	}
+
+	else if (strcmp(msg, "LCTare") == 0) {
+			SOAR_PRINT("Debug 'Load Cell Tare' command requested\n");
+			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_TARE));
+	}
+
+	else if (strcmp(msg, "LCCal") == 0) {
+			SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
+			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATE));
+	}
+	else if (strcmp(msg, "LCWeigh") == 0) {
+			SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
+			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
+
 	}
 	else {
 		// Single character command, or unknown command
