@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * File Name          : IRTask.cpp
- * Description        : Primary flight task, default task for the system.
+ * Description        : Primary IR task, default task for the system.
  ******************************************************************************
 */
 #include "IRTask.hpp"
@@ -45,12 +45,13 @@ void IRTask::Run(void * pvParams)
 
     while (1) {
 
+        Command cm;
 
-        float tempReading = MLX90614_ReadTemp(hi2c1,0x5A,0x07);
-        int temp =  static_cast<int>(tempReading);
-        //Every cycle, print something out (for testing)
-        SOAR_PRINT("Temperature reading: [%d]\n", temp );
-        //SOAR_PRINT("IRTask::Run() - [%d] Seconds\n", tempSecondCounter++);
+        //Wait forever for a command
+        qEvtQueue->ReceiveWait(cm);
+
+        //Process the command
+        HandleCommand(cm);
 
     }
 }
@@ -88,25 +89,40 @@ void IRTask::HandleCommand(Command& cm)
  */
 void IRTask::HandleRequestCommand(uint16_t taskCommand)
 {
-    //Switch for task specific command within DATA_COMMAND
-    switch (taskCommand) {
-    case IR_REQUEST_NEW_SAMPLE:
-    	SampleIRTemperature();
-        break;
-    case IR_REQUEST_TRANSMIT:
-        SOAR_PRINT("Stubbed: IR task transmit not implemented\n");
-        break;
-    case IR_REQUEST_DEBUG:
-        SOAR_PRINT("\t-- IR Data --\n");
-        SOAR_PRINT(" Temp (C)       : %d.%d\n", 10,10);
-        break;
-    default:
-        SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
-        break;
-    }
+	//Switch for task specific command within DATA_COMMAND
+	    switch (taskCommand) {
+	    case IR_REQUEST_NEW_SAMPLE:
+	    	SampleIRTemperature();
+	        break;
+	    case IR_REQUEST_TRANSMIT:
+	        SOAR_PRINT("Stubbed: IR task transmit not implemented\n");
+	        break;
+	    case IR_REQUEST_DEBUG: {
+	        SOAR_PRINT("|IR_TASK| Object Temp: %d, Ambient Temp: %d, MCU Timestamp: %u\n", static_cast<int>(objectTemp * 100),
+	        static_cast<int>(ambientTemp * 100),timestampIR);
+	        break;
+	    }
+	    case IR_REQUEST_TIMESTAMP:
+	    	SOAR_PRINT("MCU Timestamp: %u",timestampIR);
+	    	break;
+	    default:
+	        SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
+	        break;
+	    }
 }
 
+/**
+ * @brief Samples the IR sensor data (object and ambient temperature).
+ * @param no params
+ */
 void IRTask::SampleIRTemperature()
 {
+	objectTemp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TOBJ1);
+	ambientTemp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TAMB);
 
+}
+
+void IRTask::TimeStamp()
+{
+	timestampIR = HAL_GetTick();
 }

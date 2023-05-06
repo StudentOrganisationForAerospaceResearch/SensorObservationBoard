@@ -13,6 +13,7 @@
 
 #include "FlightTask.hpp"
 #include "LoadCellTask.hpp"
+#include "IRTask.hpp"
 #include "GPIO.hpp"
 #include "stm32f4xx_hal.h"
 
@@ -119,25 +120,42 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		GPIO::LED1::On();
 		// TODO: Send to HID task to blink LED, this shouldn't delay
 	}
+	// Debug command for ir temp
+	else if (strcmp(msg, "irtemp") == 0) {
 
+		SOAR_PRINT("Debug 'IRTemp sample and read' command requested\n");
+		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE));
+		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_DEBUG));
+	}
+	// Debug command for ir temp timestamp
+	else if (strcmp(msg, "irtimestamp") == 0) {
+
+		SOAR_PRINT("Debug 'IRTemp timestamp' command requested\n");
+		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_TIMESTAMP));
+	}
+	// Debug command for LoadCellInit()
 	else if (strcmp(msg, "LCInit") == 0) {
-			SOAR_PRINT("Debug 'Load Cell Init' command requested\n");
-			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_INIT));
-	}
 
+		SOAR_PRINT("Debug 'Load Cell Init' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_INIT));
+	}
+	// Debug command for LoadCellTare()
 	else if (strcmp(msg, "LCTare") == 0) {
-			SOAR_PRINT("Debug 'Load Cell Tare' command requested\n");
-			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_TARE));
-	}
 
+		SOAR_PRINT("Debug 'Load Cell Tare' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_TARE));
+	}
+	// Debug command for LoadCellCalibrate()
 	else if (strcmp(msg, "LCCal") == 0) {
-			SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
-			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATE));
-	}
-	else if (strcmp(msg, "LCWeigh") == 0) {
-			SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
-			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
 
+		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATE));
+	}
+	// Debug command for SampleLoadCellData()
+	else if (strcmp(msg, "LCWeigh") == 0) {
+
+		SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
 	}
 	else {
 		// Single character command, or unknown command

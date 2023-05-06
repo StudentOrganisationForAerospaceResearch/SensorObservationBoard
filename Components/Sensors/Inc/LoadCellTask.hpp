@@ -16,10 +16,10 @@
 /* Macros/Enums ------------------------------------------------------------*/
 enum LOADCELL_TASK_COMMANDS {
     LOADCELL_NONE = 0,
-	LOADCELL_REQUEST_INIT,
-	LOADCELL_REQUEST_TARE,
-	LOADCELL_REQUEST_CALIBRATE,
-    LOADCELL_REQUEST_NEW_SAMPLE,// Get a new load cell sample, task will be blocked for polling time
+	LOADCELL_REQUEST_INIT,		  // Send the current load cell data during initializations over the Debug UARTs
+	LOADCELL_REQUEST_TARE,		  // Send the current load cell data during tare over the Debug UART
+	LOADCELL_REQUEST_CALIBRATE,   // Send the current load cell data during calibration over the Debug UART
+    LOADCELL_REQUEST_NEW_SAMPLE,  // Get a new load cell sample, task will be blocked for polling time
     LOADCELL_REQUEST_TRANSMIT,    // Send the current load cell data over the Radio
     LOADCELL_REQUEST_DEBUG        // Send the current load cell data over the Debug UART
 };

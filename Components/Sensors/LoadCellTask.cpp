@@ -10,14 +10,14 @@
 
 
 /**
- * @brief Constructor for FlightTask
+ * @brief Constructor for LoadCellTask
  */
 LoadCellTask::LoadCellTask() : Task(LOADCELL_TASK_QUEUE_DEPTH_OBJS)
 {
 }
 
 /**
- * @brief Initialize the FlightTask
+ * @brief Initialize the LoadCellTask
  */
 void LoadCellTask::InitTask()
 {
@@ -36,12 +36,11 @@ void LoadCellTask::InitTask()
 }
 
 /**
- * @brief Instance Run loop for the Flight Task, runs on scheduler start as long as the task is initialized.
+ * @brief Instance Run loop for the LoadCellTask, runs on scheduler start as long as the task is initialized.
  * @param pvParams RTOS Passed void parameters, contains a pointer to the object instance, should not be used
  */
 void LoadCellTask::Run(void * pvParams)
 {
-
     while (1) {
 
     	Command cm;
@@ -51,7 +50,6 @@ void LoadCellTask::Run(void * pvParams)
 
     	//Process the command
     	HandleCommand(cm);
-
     }
 }
 
@@ -115,17 +113,31 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
     }
 }
 
+/**
+ * @brief Initializes the load cell pins to read data from the load cell.
+ * This is the first call.
+ * @param GPIO clk, clk pin, GPIO data, data pin
+ */
 void LoadCellTask::LoadCellInit(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin)
 {
-	hx711_init(&loadcell,clk_gpio , clk_pin ,dat_gpio, dat_pin);
+	hx711_init(&loadcell, clk_gpio , clk_pin ,dat_gpio, dat_pin);
 }
 
+/**
+ * @brief Sets up the load cell during tare. We need to call this before weighing
+ * any mass. This is the second call.
+ * @param none
+ */
 void LoadCellTask::LoadCellTare()
 {
 	hx711_tare(&loadcell, 10);
 	SOAR_PRINT("Tare ADC value %d\n", loadcell.offset*100);
 }
-
+/**
+ * @brief Calculates the calibration coefficient for calibration with a known mass.
+ * This is the third call.
+ * @param none
+ */
 void LoadCellTask::LoadCellCalibrate()
 {
 	value_loadraw = hx711_value_ave(&loadcell, 10);
@@ -133,7 +145,11 @@ void LoadCellTask::LoadCellCalibrate()
 	SOAR_PRINT("Value load raw %d\n", value_loadraw*100);
 }
 
-
+/**
+ * @brief This samples the weight of any given mass after calibration. This is the
+ * fourth call.
+ * @param none
+ */
 void LoadCellTask::SampleLoadCellData()
 {
 	measuredWeight = hx711_weight(&loadcell, 10);
