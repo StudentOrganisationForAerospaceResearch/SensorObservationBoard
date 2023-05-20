@@ -128,7 +128,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_TARE));
 	}
 	// Debug command for LoadCellCalibrate()
-	else if (strcmp(msg, "LCCal") == 0) {
+	else if (strcmp(msg, "LCCal      ", 11) == 0) {
 
 		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
 		int32_t mass = ExtractIntParameter(msg, 11);
