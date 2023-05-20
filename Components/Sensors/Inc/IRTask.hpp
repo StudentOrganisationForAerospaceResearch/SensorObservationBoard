@@ -47,9 +47,7 @@ protected:
     void SampleIRTemperature();
     void TimeStamp();
     IRSample irSample;
-    //float objectTemp;
-    //float ambientTemp;
-   // uint32_t timestampIR;
+
 
 
 private:
