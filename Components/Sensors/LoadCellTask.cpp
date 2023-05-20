@@ -41,7 +41,8 @@ void LoadCellTask::InitTask()
  */
 void LoadCellTask::Run(void * pvParams)
 {
-    while (1) {
+	hx711_init(&loadcell, LC_CLK_GPIO_Port, LC_CLK_Pin , DAT_GPIO_Port, DAT_Pin);
+	while (1) {
 
     	Command cm;
 
@@ -68,6 +69,11 @@ void LoadCellTask::HandleCommand(Command& cm)
     case REQUEST_COMMAND: {
         HandleRequestCommand(cm.GetTaskCommand());
     }
+    case LOADCELL_CALIBRATE: {
+    	float known_mass_g = cm.GetTaskCommand() / 1000;
+    	LoadCellCalibrate(known_mass_g);
+    	break;
+    }
     case TASK_SPECIFIC_COMMAND: {
         break;
     }
@@ -89,14 +95,8 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
 {
     //Switch for task specific command within DATA_COMMAND
     switch (taskCommand) {
-    case LOADCELL_REQUEST_INIT:
-    	LoadCellInit(LC_CLK_GPIO_Port, LC_CLK_Pin , DAT_GPIO_Port, DAT_Pin);
-    	break;
     case LOADCELL_REQUEST_TARE:
     	LoadCellTare();
-    	break;
-    case LOADCELL_REQUEST_CALIBRATE:
-    	LoadCellCalibrate();
     	break;
     case LOADCELL_REQUEST_NEW_SAMPLE:
     	SampleLoadCellData();
@@ -105,22 +105,12 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
         SOAR_PRINT("Stubbed: LoadCell task transmit not implemented\n");
         break;
     case LOADCELL_REQUEST_DEBUG:
-        SOAR_PRINT(" LoadCell Data: %d\n", measuredWeight);
+        SOAR_PRINT(" LoadCell Data: %d\n", loadCellSample.weight_g);
         break;
     default:
         SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
         break;
     }
-}
-
-/**
- * @brief Initializes the load cell pins to read data from the load cell.
- * This is the first call.
- * @param GPIO clk, clk pin, GPIO data, data pin
- */
-void LoadCellTask::LoadCellInit(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin)
-{
-	hx711_init(&loadcell, clk_gpio , clk_pin ,dat_gpio, dat_pin);
 }
 
 /**
@@ -130,7 +120,7 @@ void LoadCellTask::LoadCellInit(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_T
  */
 void LoadCellTask::LoadCellTare()
 {
-	hx711_tare(&loadcell, 10);
+	hx711_tare(&loadcell, 50);
 	SOAR_PRINT("Tare ADC value %d\n", loadcell.offset*100);
 }
 /**
@@ -138,12 +128,11 @@ void LoadCellTask::LoadCellTare()
  * This is the third call.
  * @param none
  */
-void LoadCellTask::LoadCellCalibrate()
+void LoadCellTask::LoadCellCalibrate(float known_mass_g)
 {
-	value_loadraw = hx711_value_ave(&loadcell, 10);
-	hx711_calibration(&loadcell, GetNoLoad(), value_loadraw, knownmass);
-	SOAR_PRINT("Value load raw %d\n", value_loadraw*100);
-}
+	int32_t load_raw_lbs = hx711_value_ave(&loadcell, 50);
+	hx711_calibration(&loadcell, GetNoLoad(), load_raw_lbs, GRAMS_TO_LBS(known_mass_g));
+	SOAR_PRINT("Value load raw %d grams\n", LBS_TO_GRAMS(load_raw_lbs));}
 
 /**
  * @brief This samples the weight of any given mass after calibration. This is the
@@ -152,7 +141,7 @@ void LoadCellTask::LoadCellCalibrate()
  */
 void LoadCellTask::SampleLoadCellData()
 {
-	measuredWeight = hx711_weight(&loadcell, 10);
-	SOAR_PRINT("The measured weight it %d\n", measuredWeight*100);
+	loadCellSample.weight_g = hx711_weight(&loadcell, 50);
+	SOAR_PRINT("The measured weight it %d\n", loadCellSample.weight_g*100);
 
 }

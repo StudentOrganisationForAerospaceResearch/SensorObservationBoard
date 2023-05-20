@@ -17,9 +17,15 @@ enum IR_TASK_COMMANDS {
     IR_REQUEST_NEW_SAMPLE,  // Get a new IR sample, task will be blocked for polling time
     IR_REQUEST_TRANSMIT,    // Send the current barometer data over the Radio
     IR_REQUEST_DEBUG,       // Send the current barometer data over the Debug UART
-	IR_REQUEST_TIMESTAMP	// Get a new time stamp for the IR sample
 };
 
+
+struct IRSample {
+	float object_temp;
+	float ambient_temp;
+	uint32_t timestamp;
+
+};
 
 class IRTask : public Task
 {
@@ -40,9 +46,10 @@ protected:
 
     void SampleIRTemperature();
     void TimeStamp();
-    float objectTemp;
-    float ambientTemp;
-    uint32_t timestampIR;
+    IRSample irSample;
+    //float objectTemp;
+    //float ambientTemp;
+   // uint32_t timestampIR;
 
 
 private:

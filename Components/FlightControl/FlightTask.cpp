@@ -41,7 +41,7 @@ void FlightTask::InitTask()
 void FlightTask::Run(void * pvParams)
 {
     uint32_t tempSecondCounter = 0; // TODO: Temporary counter, would normally be in HeartBeat task or HID Task, unless FlightTask is the HeartBeat task
-    GPIO::LED1::Off();
+
 
     while (1) {
         // There's effectively 3 types of tasks... 'Async' and 'Synchronous-Blocking' and 'Synchronous-Non-Blocking'
@@ -61,9 +61,9 @@ void FlightTask::Run(void * pvParams)
 
         // Since FlightTask is so critical to managing the system, it may make sense to make this a Async task that handles commands as they come in, and have these display commands be routed over to the DisplayTask
         // or maybe HID (Human Interface Device) task that handles both updating buzzer frequencies and LED states.
-        GPIO::LED1::On();
+
         osDelay(500);
-        GPIO::LED1::Off();
+
         osDelay(500);
 
         //Every cycle, print something out (for testing)

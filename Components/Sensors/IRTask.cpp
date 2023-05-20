@@ -34,6 +34,7 @@ void IRTask::InitTask()
             (TaskHandle_t*)&rtTaskHandle);
 
     SOAR_ASSERT(rtValue == pdPASS, "IRTask::InitTask() - xTaskCreate() failed");
+
 }
 
 /**
@@ -98,13 +99,10 @@ void IRTask::HandleRequestCommand(uint16_t taskCommand)
 	        SOAR_PRINT("Stubbed: IR task transmit not implemented\n");
 	        break;
 	    case IR_REQUEST_DEBUG: {
-	        SOAR_PRINT("|IR_TASK| Object Temp: %d, Ambient Temp: %d, MCU Timestamp: %u\n", static_cast<int>(objectTemp * 100),
-	        static_cast<int>(ambientTemp * 100),timestampIR);
+	        SOAR_PRINT("|IR_TASK| Object Temp: %d, Ambient Temp: %d, MCU Timestamp: %u\n", static_cast<int>(irSample.object_temp * 100),
+	        static_cast<int>(irSample.ambient_temp * 100),irSample.timestamp);
 	        break;
 	    }
-	    case IR_REQUEST_TIMESTAMP:
-	    	SOAR_PRINT("MCU Timestamp: %u",timestampIR);
-	    	break;
 	    default:
 	        SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
 	        break;
@@ -117,12 +115,9 @@ void IRTask::HandleRequestCommand(uint16_t taskCommand)
  */
 void IRTask::SampleIRTemperature()
 {
-	objectTemp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TOBJ1);
-	ambientTemp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TAMB);
 
+	irSample.object_temp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TOBJ1);
+	irSample.ambient_temp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TAMB);
+	irSample.timestamp = HAL_GetTick();
 }
 
-void IRTask::TimeStamp()
-{
-	timestampIR = HAL_GetTick();
-}

@@ -114,30 +114,12 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		SOAR_PRINT("Lowest Ever Heap Size\t: %d Bytes\n", xPortGetMinimumEverFreeHeapSize());
 		SOAR_PRINT("Debug Task Runtime  \t: %d ms\n\n", TICKS_TO_MS(xTaskGetTickCount()));
 	}
-	else if (strcmp(msg, "blinkled") == 0) {
-		// Print message
-		SOAR_PRINT("Debug 'LED blink' command requested\n");
-		GPIO::LED1::On();
-		// TODO: Send to HID task to blink LED, this shouldn't delay
-	}
 	// Debug command for ir temp
-	else if (strcmp(msg, "irtemp") == 0) {
+	else if (strcmp(msg, "IRTemp") == 0) {
 
 		SOAR_PRINT("Debug 'IRTemp sample and read' command requested\n");
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE));
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_DEBUG));
-	}
-	// Debug command for ir temp timestamp
-	else if (strcmp(msg, "irtimestamp") == 0) {
-
-		SOAR_PRINT("Debug 'IRTemp timestamp' command requested\n");
-		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_TIMESTAMP));
-	}
-	// Debug command for LoadCellInit()
-	else if (strcmp(msg, "LCInit") == 0) {
-
-		SOAR_PRINT("Debug 'Load Cell Init' command requested\n");
-		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_INIT));
 	}
 	// Debug command for LoadCellTare()
 	else if (strcmp(msg, "LCTare") == 0) {
@@ -149,7 +131,11 @@ void DebugTask::HandleDebugMessage(const char* msg)
 	else if (strcmp(msg, "LCCal") == 0) {
 
 		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
-		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATE));
+		int32_t mass = ExtractIntParameter(msg, 11);
+		if (mass != ERRVAL)
+		{
+			LoadCellTask::Inst().SendCommand(Command(LOADCELL_CALIBRATE, mass));
+		}
 	}
 	// Debug command for SampleLoadCellData()
 	else if (strcmp(msg, "LCWeigh") == 0) {

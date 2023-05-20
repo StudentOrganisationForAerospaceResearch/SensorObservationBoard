@@ -8,6 +8,8 @@
 */
 #ifndef SOAR_LOADCELLTASK_HPP_
 #define SOAR_LOADCELLTASK_HPP_
+#define LBS_TO_GRAMS(lbs) ((lbs) * 453.592)
+#define GRAMS_TO_LBS(grams) ((grams) * 0.00220462)
 #include "Task.hpp"
 #include "SystemDefines.hpp"
 #include "hx711.h"
@@ -16,7 +18,6 @@
 /* Macros/Enums ------------------------------------------------------------*/
 enum LOADCELL_TASK_COMMANDS {
     LOADCELL_NONE = 0,
-	LOADCELL_REQUEST_INIT,		  // Send the current load cell data during initializations over the Debug UARTs
 	LOADCELL_REQUEST_TARE,		  // Send the current load cell data during tare over the Debug UART
 	LOADCELL_REQUEST_CALIBRATE,   // Send the current load cell data during calibration over the Debug UART
     LOADCELL_REQUEST_NEW_SAMPLE,  // Get a new load cell sample, task will be blocked for polling time
@@ -24,6 +25,11 @@ enum LOADCELL_TASK_COMMANDS {
     LOADCELL_REQUEST_DEBUG        // Send the current load cell data over the Debug UART
 };
 
+struct LoadCellSample
+{
+	float weight_g;
+	//float knownmass_lb = 16.5347; //This weight it in pounds and refers to the aluminum plate.
+};
 
 class LoadCellTask : public Task
 {
@@ -34,7 +40,6 @@ public:
     }
 
     void InitTask();
-    int32_t GetNoLoad() {return loadcell.offset; }
 
 protected:
     static void RunTask(void* pvParams) { LoadCellTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
@@ -46,14 +51,14 @@ protected:
     void HandleRequestCommand(uint16_t taskCommand);
 
     void SampleLoadCellData();
-    void LoadCellInit(GPIO_TypeDef *clk_gpio, uint16_t clk_pin, GPIO_TypeDef *dat_gpio, uint16_t dat_pin);
     void LoadCellTare();
-    void LoadCellCalibrate();
+    void LoadCellCalibrate(float known_mass_g);
+    int32_t GetNoLoad() {return loadcell.offset; }
+
     hx711_t loadcell;
-    float knownmass = 16.5347; //This weight it in pounds and refers to the aluminum plate.
-    int32_t value_noload;
-    int32_t value_loadraw;
-    float measuredWeight;
+
+    LoadCellSample loadCellSample;
+
 
 
 private:

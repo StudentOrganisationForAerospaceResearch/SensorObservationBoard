@@ -17,23 +17,6 @@
 
 namespace GPIO
 {
-	namespace LED1
-	{
-		inline void On() {}
-		inline void Off() {}
-		inline void Toggle() {}
-
-		inline bool IsOn() { return false; }
-	}
-
-	namespace LED2
-	{
-		inline void On() {}
-		inline void Off() {}
-		inline void Toggle() {}
-
-		inline bool IsOn() { return false; }
-	}
 	
 }
 
