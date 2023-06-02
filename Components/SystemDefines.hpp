@@ -50,16 +50,13 @@ constexpr uint8_t TASK_DEBUG_PRIORITY = 2;			// Priority of the debug task
 constexpr uint8_t TASK_DEBUG_QUEUE_DEPTH_OBJS = 10;		// Size of the debug task queue
 constexpr uint16_t TASK_DEBUG_STACK_DEPTH_WORDS = 256;		// Size of the debug task stack
 
-// BAROMETER TASK
-constexpr uint8_t TASK_BAROMETER_PRIORITY = 2;			// Priority of the barometer task
-constexpr uint8_t TASK_BAROMETER_QUEUE_DEPTH_OBJS = 10;		// Size of the barometer task queue
-constexpr uint16_t TASK_BAROMETER_STACK_DEPTH_WORDS = 256;		// Size of the barometer task stack
 
-// IMU TASK (ACCEL/GYRO/MAGNETO)
-constexpr uint8_t TASK_IMU_PRIORITY = 2;			// Priority of the barometer task
-constexpr uint8_t TASK_IMU_QUEUE_DEPTH_OBJS = 10;		// Size of the barometer task queue
-constexpr uint16_t TASK_IMU_STACK_DEPTH_WORDS = 256;		// Size of the barometer task stack
+// TELEMETRY Task
+constexpr uint8_t TELEMETRY_TASK_RTOS_PRIORITY = 2;            // Priority of the flight task
+constexpr uint8_t TELEMETRY_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the flight task queue
+constexpr uint16_t TELEMETRY_TASK_STACK_DEPTH_WORDS = 512;        // Size of the flight task stack
 
+constexpr uint32_t TELEMETRY_DEFAULT_LOGGING_RATE_MS = 1000; // Default logging delay for telemetry task
 
 
 /* System Defines ------------------------------------------------------------------*/
