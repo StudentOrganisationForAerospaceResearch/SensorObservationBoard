@@ -104,16 +104,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
 {
 	//-- SYSTEM / CHAR COMMANDS -- (Must be last)
 	// Debug command for LoadCellCalibrate()
-	if (strncmp(msg, "Cal ", 4) == 0) {
-
-		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
-		int32_t mass = ExtractIntParameter(msg, 4);
-		if (mass != ERRVAL)
-		{
-			LoadCellTask::Inst().SendCommand(Command(LOADCELL_CALIBRATE, mass));
-		}
-	}
-	else if (strcmp(msg, "sysreset") == 0) {
+	if (strcmp(msg, "sysreset") == 0) {
 		// Reset the system
 		SOAR_ASSERT(false, "System reset requested");
 	}
@@ -145,6 +136,14 @@ void DebugTask::HandleDebugMessage(const char* msg)
 	else if (strcmp(msg, "Sample") == 0) {
 		SOAR_PRINT("Debug 'Load Cell Sample' command requested\n");
 		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DUMP_DATA));
+	}
+	else if (strncmp(msg, "Cal ", 4) == 0) {
+		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
+		int32_t code = ExtractIntParameter(msg, 4);
+		if (code != ERRVAL)
+		{
+			LoadCellTask::Inst().SendCommand(Command(LOADCELL_CALIBRATE, code));
+		}
 	}
 	else if (strcmp(msg, "Sample Stop") == 0) {
 		SOAR_PRINT("Debug 'Load Cell Sample Stop' command requested\n");

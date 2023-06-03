@@ -57,6 +57,7 @@ void LoadCellTask::Run(void * pvParams)
     		SampleDumpLoadCellData();
     	}
 
+    	cm.Reset();
     	osDelay(25);
     }
 }
@@ -78,8 +79,19 @@ void LoadCellTask::HandleCommand(Command& cm)
         break;
     }
     case LOADCELL_CALIBRATE: {
-    	float known_mass_g = cm.GetTaskCommand() / 100;
-    	LoadCellCalibrate(known_mass_g);
+    	float code = cm.GetTaskCommand();
+		if (code == 1) {
+			LoadCellCalibrate(622.21);
+		}
+		if (code == 2) {
+			LoadCellCalibrate(664.82);
+		}
+		if (code == 3) {
+			LoadCellCalibrate(674.39);
+		}
+		if (code == 4) {
+			LoadCellCalibrate(2430.04);
+		}
     	break;
     }
     case TASK_SPECIFIC_COMMAND: {
@@ -169,5 +181,6 @@ void LoadCellTask::SampleLoadCellData()
 void LoadCellTask::SampleDumpLoadCellData()
 {
 	int32_t load_raw = hx711_value_ave(&loadcell, 10);
-	SOAR_PRINT("Value load raw %d grams\n", load_raw);
+	loadCellSample.weight_g = hx711_weight(&loadcell, 10);
+	SOAR_PRINT("Value load raw %d, shifted: %d, weight: %d.%d g\n", load_raw, (load_raw ^ 0x800000), (int)(loadCellSample.weight_g), abs(int(loadCellSample.weight_g * 100) % 100));
 }
