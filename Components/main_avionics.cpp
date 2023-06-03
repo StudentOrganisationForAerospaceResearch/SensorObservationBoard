@@ -34,9 +34,10 @@ void run_main() {
 	// Init Tasks
 	//FlightTask::Inst().InitTask();
 	//IRTask::Inst().InitTask();
-	//UARTTask::Inst().InitTask();
-	//DebugTask::Inst().InitTask();
+	UARTTask::Inst().InitTask();
 	LoadCellTask::Inst().InitTask();
+	DebugTask::Inst().InitTask();
+
 
 
 

@@ -78,7 +78,7 @@ int32_t hx711_value(hx711_t *hx711)
     if(HAL_GPIO_ReadPin(hx711->dat_gpio, hx711->dat_pin) == GPIO_PIN_SET)
       data ++;
   }
-  data = data ^ 0x800000;
+  //data = data ^ 0x800000;
   HAL_GPIO_WritePin(hx711->clk_gpio, hx711->clk_pin, GPIO_PIN_SET);
   hx711_delay_us();
   HAL_GPIO_WritePin(hx711->clk_gpio, hx711->clk_pin, GPIO_PIN_RESET);

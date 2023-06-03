@@ -12,6 +12,7 @@
 #include <cstring>
 
 #include "FlightTask.hpp"
+#include "LoadCellTask.hpp"
 #include "IRTask.hpp"
 #include "GPIO.hpp"
 #include "stm32f4xx_hal.h"
@@ -102,7 +103,17 @@ void DebugTask::Run(void * pvParams)
 void DebugTask::HandleDebugMessage(const char* msg)
 {
 	//-- SYSTEM / CHAR COMMANDS -- (Must be last)
-	if (strcmp(msg, "sysreset") == 0) {
+	// Debug command for LoadCellCalibrate()
+	if (strncmp(msg, "Cal ", 4) == 0) {
+
+		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
+		int32_t mass = ExtractIntParameter(msg, 4);
+		if (mass != ERRVAL)
+		{
+			LoadCellTask::Inst().SendCommand(Command(LOADCELL_CALIBRATE, mass));
+		}
+	}
+	else if (strcmp(msg, "sysreset") == 0) {
 		// Reset the system
 		SOAR_ASSERT(false, "System reset requested");
 	}
@@ -113,19 +124,32 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		SOAR_PRINT("Lowest Ever Heap Size\t: %d Bytes\n", xPortGetMinimumEverFreeHeapSize());
 		SOAR_PRINT("Debug Task Runtime  \t: %d ms\n\n", TICKS_TO_MS(xTaskGetTickCount()));
 	}
-	else if (strcmp(msg, "blinked") == 0) {
-		// Print message
-		SOAR_PRINT("Debug 'LED blink' command requested\n");
-		GPIO::LED1::On();
-		// TODO: Send to HID task to blink LED, this shouldn't delay
-	}
-	else if (strcmp(msg, "irtemp") == 0)
-	{
+	// Debug command for ir temp
+	else if (strcmp(msg, "IRTemp") == 0) {
+
 		SOAR_PRINT("Debug 'IRTemp sample and read' command requested\n");
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE));
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_DEBUG));
 	}
+	// Debug command for LoadCellTare()
+	else if (strcmp(msg, "T") == 0) {
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_TARE));
+		SOAR_PRINT("Debug 'Load Cell Tare' command requested\n");
+	}
 
+	// Debug command for SampleLoadCellData()
+	else if (strcmp(msg, "W") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
+	}
+	else if (strcmp(msg, "Sample") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Sample' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DUMP_DATA));
+	}
+	else if (strcmp(msg, "Sample Stop") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Sample Stop' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DUMP_DATA_STOP));
+	}
 	else {
 		// Single character command, or unknown command
 		switch (msg[0]) {
@@ -205,3 +229,4 @@ int32_t DebugTask::ExtractIntParameter(const char* msg, uint16_t identifierLen)
 
 	return val;
 }
+
