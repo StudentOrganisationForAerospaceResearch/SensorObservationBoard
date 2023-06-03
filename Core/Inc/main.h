@@ -65,8 +65,8 @@ void Error_Handler(void);
 #define LC_CLK_GPIO_Port GPIOA
 #define DAT_Pin GPIO_PIN_8
 #define DAT_GPIO_Port GPIOC
-#define UART2_TX_Pin GPIO_PIN_9
-#define UART2_TX_GPIO_Port GPIOA
+#define UART1_TX_Pin GPIO_PIN_9
+#define UART1_TX_GPIO_Port GPIOA
 #define CS1_Pin GPIO_PIN_5
 #define CS1_GPIO_Port GPIOB
 #define I2C_CLK_Pin GPIO_PIN_6

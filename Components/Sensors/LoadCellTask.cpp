@@ -68,9 +68,10 @@ void LoadCellTask::HandleCommand(Command& cm)
     switch (cm.GetCommand()) {
     case REQUEST_COMMAND: {
         HandleRequestCommand(cm.GetTaskCommand());
+        break;
     }
     case LOADCELL_CALIBRATE: {
-    	float known_mass_g = cm.GetTaskCommand() / 1000;
+    	float known_mass_g = cm.GetTaskCommand() / 100.f;
     	LoadCellCalibrate(known_mass_g);
     	break;
     }
@@ -120,8 +121,9 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
  */
 void LoadCellTask::LoadCellTare()
 {
-	hx711_tare(&loadcell, 50);
-	SOAR_PRINT("Tare ADC value %d\n", loadcell.offset*100);
+	hx711_tare(&loadcell, 10);
+	SOAR_PRINT("Value loadcell.offset %d \n", loadcell.offset);
+	SOAR_PRINT("Value loadcell.coef %d.%d \n", (int)loadcell.coef, (int)(loadcell.coef * 1000) % 1000);
 }
 /**
  * @brief Calculates the calibration coefficient for calibration with a known mass.
@@ -130,9 +132,12 @@ void LoadCellTask::LoadCellTare()
  */
 void LoadCellTask::LoadCellCalibrate(float known_mass_g)
 {
-	int32_t load_raw_lbs = hx711_value_ave(&loadcell, 50);
-	hx711_calibration(&loadcell, GetNoLoad(), load_raw_lbs, GRAMS_TO_LBS(known_mass_g));
-	SOAR_PRINT("Value load raw %d grams\n", LBS_TO_GRAMS(load_raw_lbs));}
+	int32_t load_raw = hx711_value_ave(&loadcell, 10);
+	SOAR_PRINT("No Load Value: %d Load Value: %d", GetNoLoad(), load_raw);
+	hx711_calibration(&loadcell, GetNoLoad(), load_raw, known_mass_g);
+	SOAR_PRINT("Value loadcell.offset %d \n", loadcell.offset);
+	SOAR_PRINT("Value loadcell.coef %d.%d \n", (int)loadcell.coef, (int)(loadcell.coef * 1000) % 1000);
+}
 
 /**
  * @brief This samples the weight of any given mass after calibration. This is the
@@ -141,7 +146,10 @@ void LoadCellTask::LoadCellCalibrate(float known_mass_g)
  */
 void LoadCellTask::SampleLoadCellData()
 {
-	loadCellSample.weight_g = hx711_weight(&loadcell, 50);
-	SOAR_PRINT("The measured weight it %d\n", loadCellSample.weight_g*100);
-
+	uint32_t ADCdata;
+	loadCellSample.weight_g = hx711_weight(&loadcell, 10, ADCdata);
+	SOAR_PRINT("LCWeigh %d, %d, %d\n", ADCdata, (int)(loadCellSample.weight_g), HAL_GetTick());
+//	SOAR_PRINT("The measured weight it %d.%d grams\n", (int)loadCellSample.weight_g, (int)(loadCellSample.weight_g * 1000)	 % 1000);
+//	SOAR_PRINT("Value loadcell.offset %d \n", loadcell.offset);
+//	SOAR_PRINT("Value loadcell.coef %d.%d \n", (int)loadcell.coef, (int)(loadcell.coef * 1000) % 1000);
 }

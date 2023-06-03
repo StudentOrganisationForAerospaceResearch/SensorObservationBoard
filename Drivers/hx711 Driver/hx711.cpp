@@ -121,7 +121,7 @@ void hx711_calibration(hx711_t *hx711, int32_t noload_raw, int32_t load_raw, flo
   hx711_unlock(hx711);
 }
 //#############################################################################################
-float hx711_weight(hx711_t *hx711, uint16_t sample)
+float hx711_weight(hx711_t *hx711, uint16_t sample, uint32_t& ADCdata)
 {
   hx711_lock(hx711);
   int64_t  ave = 0;
@@ -130,7 +130,8 @@ float hx711_weight(hx711_t *hx711, uint16_t sample)
     ave += hx711_value(hx711);
     hx711_delay(5);
   }
-  int32_t data = (int32_t)(ave / sample);
+  ADCdata = (int32_t)(ave / sample);
+  uint32_t data = (int32_t)(ave / sample);
   float answer =  (data - hx711->offset) / hx711->coef;
   hx711_unlock(hx711);
   return answer;
