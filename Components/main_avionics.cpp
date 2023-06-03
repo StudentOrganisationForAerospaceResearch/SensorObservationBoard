@@ -20,6 +20,7 @@
 #include "FlightTask.hpp"
 #include "DebugTask.hpp"
 #include "IRTask.hpp"
+#include "LoadCellTask.hpp"
 
 
 /* Global Variables ------------------------------------------------------------------*/
@@ -32,9 +33,10 @@ Mutex Global::vaListMutex;
 void run_main() {
 	// Init Tasks
 	//FlightTask::Inst().InitTask();
-	IRTask::Inst().InitTask();
-	UARTTask::Inst().InitTask();
-	DebugTask::Inst().InitTask();
+	//IRTask::Inst().InitTask();
+	//UARTTask::Inst().InitTask();
+	//DebugTask::Inst().InitTask();
+	LoadCellTask::Inst().InitTask();
 
 
 

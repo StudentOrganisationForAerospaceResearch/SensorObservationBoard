@@ -125,10 +125,6 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE));
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_DEBUG));
 	}
-	else if (strcmp(msg, "timestamp") == 0)
-	{
-
-	}
 
 	else {
 		// Single character command, or unknown command
