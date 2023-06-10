@@ -104,36 +104,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
 {
 	//-- SYSTEM / CHAR COMMANDS -- (Must be last)
 	// Debug command for LoadCellCalibrate()
-	if (strncmp(msg, "LCCal ", 6) == 0) {
-
-		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
-		int16_t mass = ExtractIntParameter(msg, 6);
-		if (mass != ERRVAL)
-		{
-			LoadCellTask::Inst().SendCommand(Command(LOADCELL_CALIBRATE, mass));
-		}
-		while (1) {
-			osDelay(1000);
-//			SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
-			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
-		}
-	}
-	// Debug command for LoadCellTare()
-	else if (strcmp(msg, "LCTare") == 0) {
-
-		SOAR_PRINT("Debug 'Load Cell Tare' command requested\n");
-		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_TARE));
-
-	}
-	// Debug command for SampleLoadCellData()
-	else if (strcmp(msg, "LCWeigh") == 0) {
-		while (1) {
-			osDelay(1000);
-//			SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
-			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
-		}
-	}
-	else if (strcmp(msg, "sysreset") == 0) {
+	if (strcmp(msg, "sysreset") == 0) {
 		// Reset the system
 		SOAR_ASSERT(false, "System reset requested");
 	}
@@ -150,6 +121,33 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		SOAR_PRINT("Debug 'IRTemp sample and read' command requested\n");
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE));
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_DEBUG));
+	}
+	// Debug command for LoadCellTare()
+	else if (strcmp(msg, "T") == 0) {
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_TARE));
+		SOAR_PRINT("Debug 'Load Cell Tare' command requested\n");
+	}
+
+	// Debug command for SampleLoadCellData()
+	else if (strcmp(msg, "W") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
+	}
+	else if (strcmp(msg, "Sample") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Sample' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DUMP_DATA));
+	}
+	else if (strncmp(msg, "Cal ", 4) == 0) {
+		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
+		int32_t code = ExtractIntParameter(msg, 4);
+		if (code != ERRVAL)
+		{
+			LoadCellTask::Inst().SendCommand(Command(LOADCELL_CALIBRATE, code));
+		}
+	}
+	else if (strcmp(msg, "Sample Stop") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Sample Stop' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DUMP_DATA_STOP));
 	}
 	else {
 		// Single character command, or unknown command
@@ -230,3 +228,4 @@ int32_t DebugTask::ExtractIntParameter(const char* msg, uint16_t identifierLen)
 
 	return val;
 }
+

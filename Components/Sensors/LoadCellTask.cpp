@@ -1,4 +1,4 @@
-/**
+/*
  ******************************************************************************
  * File Name          : LoadCellTask.cpp
  * Description        : Primary LoadCell task, default task for the system.
@@ -7,7 +7,7 @@
 #include <Sensors/Inc/LoadCellTask.hpp>
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
-
+#include <stdlib.h>
 
 /**
  * @brief Constructor for LoadCellTask
@@ -46,11 +46,19 @@ void LoadCellTask::Run(void * pvParams)
 
     	Command cm;
 
-    	//Wait forever for a command
-    	qEvtQueue->ReceiveWait(cm);
+    	//Wait for a command
+    	bool has_command = qEvtQueue->Receive(cm, 25);
+    	if (has_command) {
+    		//Process the command
+    		HandleCommand(cm);
+    	}
 
-    	//Process the command
-    	HandleCommand(cm);
+    	if (is_dump_sample) {
+    		SampleDumpLoadCellData();
+    	}
+
+    	cm.Reset();
+    	osDelay(25);
     }
 }
 
@@ -71,8 +79,16 @@ void LoadCellTask::HandleCommand(Command& cm)
         break;
     }
     case LOADCELL_CALIBRATE: {
-    	float known_mass_g = cm.GetTaskCommand() / 100.f;
-    	LoadCellCalibrate(known_mass_g);
+    	float code = cm.GetTaskCommand();
+		if (code == 1) {
+			LoadCellCalibrate(859.32);
+		}
+		if (code == 2) {
+			LoadCellCalibrate(859.74);
+		}
+		if (code == 3) {
+			LoadCellCalibrate(2430.04);
+		}
     	break;
     }
     case TASK_SPECIFIC_COMMAND: {
@@ -108,6 +124,13 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
     case LOADCELL_REQUEST_DEBUG:
         SOAR_PRINT(" LoadCell Data: %d\n", loadCellSample.weight_g);
         break;
+    case LOADCELL_REQUEST_DUMP_DATA:
+    	SOAR_PRINT("Offset: %d, Scale: %d.%d\n", loadcell.offset, (int)(loadcell.coef), abs(int(loadcell.coef * 100) % 100));
+    	is_dump_sample = true;
+    	break;
+    case LOADCELL_REQUEST_DUMP_DATA_STOP:
+        is_dump_sample = false;
+        break;
     default:
         SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
         break;
@@ -122,8 +145,8 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
 void LoadCellTask::LoadCellTare()
 {
 	hx711_tare(&loadcell, 10);
-	SOAR_PRINT("Value loadcell.offset %d \n", loadcell.offset);
-	SOAR_PRINT("Value loadcell.coef %d.%d \n", (int)loadcell.coef, (int)(loadcell.coef * 1000) % 1000);
+	SOAR_PRINT("Tare ADC value %d\n", loadcell.offset);
+	SOAR_PRINT("Tare ADC scale %d.%d\n", (int)(loadcell.coef), abs(int(loadcell.coef * 100) % 100));
 }
 /**
  * @brief Calculates the calibration coefficient for calibration with a known mass.
@@ -133,10 +156,10 @@ void LoadCellTask::LoadCellTare()
 void LoadCellTask::LoadCellCalibrate(float known_mass_g)
 {
 	int32_t load_raw = hx711_value_ave(&loadcell, 10);
-	SOAR_PRINT("No Load Value: %d Load Value: %d", GetNoLoad(), load_raw);
 	hx711_calibration(&loadcell, GetNoLoad(), load_raw, known_mass_g);
-	SOAR_PRINT("Value loadcell.offset %d \n", loadcell.offset);
-	SOAR_PRINT("Value loadcell.coef %d.%d \n", (int)loadcell.coef, (int)(loadcell.coef * 1000) % 1000);
+	SOAR_PRINT("Value load raw %d\n", load_raw);
+	SOAR_PRINT("Value no load raw %d\n", loadcell.offset);
+	SOAR_PRINT("Tare ADC scale %d.%d\n", (int)(loadcell.coef), abs(int(loadcell.coef * 100) % 100));
 }
 
 /**
@@ -146,10 +169,16 @@ void LoadCellTask::LoadCellCalibrate(float known_mass_g)
  */
 void LoadCellTask::SampleLoadCellData()
 {
-	uint32_t ADCdata;
-	loadCellSample.weight_g = hx711_weight(&loadcell, 10, ADCdata);
-	SOAR_PRINT("LCWeigh %d, %d, %d\n", ADCdata, (int)(loadCellSample.weight_g), HAL_GetTick());
-//	SOAR_PRINT("The measured weight it %d.%d grams\n", (int)loadCellSample.weight_g, (int)(loadCellSample.weight_g * 1000)	 % 1000);
-//	SOAR_PRINT("Value loadcell.offset %d \n", loadcell.offset);
-//	SOAR_PRINT("Value loadcell.coef %d.%d \n", (int)loadcell.coef, (int)(loadcell.coef * 1000) % 1000);
+	loadCellSample.weight_g = hx711_weight(&loadcell, 10);
+	int32_t load_raw = hx711_value_ave(&loadcell, 10);
+	SOAR_PRINT("Value load raw %d grams, Offset: %d, Scale: %d.%d\n", load_raw, loadcell.offset, (int)(loadcell.coef), abs(int(loadcell.coef * 100) % 100));
+	SOAR_PRINT("Weighed scale %d.%d\n", (int)(loadCellSample.weight_g), abs(int(loadCellSample.weight_g * 100) % 100));
+}
+
+void LoadCellTask::SampleDumpLoadCellData()
+{
+	int32_t load_raw = hx711_value_ave(&loadcell, 10);
+	loadCellSample.weight_g = hx711_weight(&loadcell, 10);
+	//SOAR_PRINT("Raw: %d, shifted: %d, weight: %d\n", load_raw, (load_raw ^ 0x800000), (loadCellSample.weight_g*100));
+	SOAR_PRINT("Raw: %d, shifted: %d, weight: %d.%d\n", load_raw, (load_raw ^ 0x800000), (int)(loadCellSample.weight_g), abs(int(loadCellSample.weight_g * 100) % 100));
 }

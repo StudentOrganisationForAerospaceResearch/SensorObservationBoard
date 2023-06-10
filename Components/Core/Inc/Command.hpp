@@ -18,11 +18,11 @@
 enum GLOBAL_COMMANDS : uint8_t
 {
 	COMMAND_NONE = 0,		// No command, packet can probably be ignored
+	LOADCELL_CALIBRATE,
 	TASK_SPECIFIC_COMMAND,	// Runs a task specific command when given this object
 	DATA_COMMAND,			// Data command, used to send data to a task. Target is stored in taskCommand
     CONTROL_ACTION,			// Control actions, used in Rocket State Machine, direct translation to RCU<->DMB Protocol
-	REQUEST_COMMAND,		// Request command
-	LOADCELL_CALIBRATE
+	REQUEST_COMMAND			// Request command
 };
 
 /* Class -----------------------------------------------------------------*/
@@ -41,7 +41,6 @@ public:
 	Command(GLOBAL_COMMANDS command);
 	Command(uint16_t taskCommand);
 	Command(GLOBAL_COMMANDS command, uint16_t taskCommand);
-
 
 	//~Command();	// We can't handle memory like this, since the object would be 'destroyed' after copying to the RTOS queue
 
@@ -69,8 +68,6 @@ protected:
 
 	uint8_t* data;				// Pointer to optional data
 	uint16_t dataSize;			// Size of optional data
-
-	uint32_t passedParam; 		// Any kind of param passed in with command
 
 private:
 	bool bShouldFreeData;		// Should the Command handle freeing the data pointer (necessary to enable Command object to handle static memory ptrs)
