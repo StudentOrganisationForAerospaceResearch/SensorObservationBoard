@@ -115,7 +115,6 @@ void IRTask::HandleRequestCommand(uint16_t taskCommand)
  */
 void IRTask::SampleIRTemperature()
 {
-
 	irSample.object_temp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TOBJ1);
 	irSample.ambient_temp = MLX90614_ReadTemp(hi2c1,MLX90614_DEFAULT_SA,MLX90614_TAMB);
 	irSample.timestamp = HAL_GetTick();

@@ -42,7 +42,7 @@ void LoadCellTask::InitTask()
  */
 void LoadCellTask::Run(void * pvParams)
 {
-	hx711_init(&loadcell, LC_CLK_GPIO_Port, LC_CLK_Pin , DAT_GPIO_Port, DAT_Pin);
+	hx711_init(&loadcell, LC_CLK_GPIO_Port, LC_CLK_Pin , LC_DATA_GPIO_Port, LC_DATA_Pin);
 	while (1) {
 
     	Command cm;
