@@ -45,10 +45,7 @@ protected:
     void HandleRequestCommand(uint16_t taskCommand);
 
     void SampleIRTemperature();
-    void TimeStamp();
     IRSample irSample;
-
-
 
 private:
     // Private Functions

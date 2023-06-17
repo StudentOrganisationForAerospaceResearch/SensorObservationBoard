@@ -1,9 +1,7 @@
-
-
 /**
  ******************************************************************************
  * File Name          : LoadCellTask.hpp
- * Description        : Primary LoadCell task, default task for the system.
+ * Description        : Primary LoadCell task for reading rocket mass
  ******************************************************************************
 */
 #ifndef SOAR_LOADCELLTASK_HPP_
@@ -59,7 +57,7 @@ protected:
     void TransmitProtocolLoadCellData();
 
     hx711_t loadcell;
-    LoadCellSample load_cell_sample;
+    LoadCellSample rocket_mass_sample;
     float calibration_mass_g;
 
 private:

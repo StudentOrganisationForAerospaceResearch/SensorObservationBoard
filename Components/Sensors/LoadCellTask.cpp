@@ -116,7 +116,7 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
     	break;
     }
     case LOADCELL_REQUEST_DEBUG: {
-        SOAR_PRINT("Load Cell read weight: %d.%d grams\n", (int)load_cell_sample.weight_g, abs(int(load_cell_sample.weight_g * 1000) % 1000));
+        SOAR_PRINT("Load Cell read weight: %d.%d grams\n", (int)rocket_mass_sample.weight_g, abs(int(rocket_mass_sample.weight_g * 1000) % 1000));
         break;
     }
     default:
@@ -154,8 +154,8 @@ void LoadCellTask::LoadCellCalibrate()
 void LoadCellTask::SampleLoadCellData()
 {
 	uint32_t ADCdata;
-	load_cell_sample.weight_g = hx711_weight(&loadcell, 10, ADCdata);
-	load_cell_sample.timestamp_ms = HAL_GetTick();
+	rocket_mass_sample.weight_g = hx711_weight(&loadcell, 10, ADCdata);
+	rocket_mass_sample.timestamp_ms = HAL_GetTick();
 }
 
 void LoadCellTask::TransmitProtocolLoadCellData()
@@ -166,7 +166,7 @@ void LoadCellTask::TransmitProtocolLoadCellData()
 //	msg.set_message_id((uint32_t)Proto::MessageID::MSG_TELEMETRY);
 
 	Proto::LRLoadCell loadCellSample;
-	loadCellSample.set_rocket_mass(load_cell_sample.weight_g);
+	loadCellSample.set_rocket_mass(rocket_mass_sample.weight_g);
 	msg.set_lr(loadCellSample);
 
 	EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> writeBuffer;

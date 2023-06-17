@@ -13,7 +13,7 @@
 /* Macros/Enums ------------------------------------------------------------*/
 enum THERMOCOUPLE_TASK_COMMANDS {
     THERMOCOUPLE_NONE = 0,
-    THERMOCOUPLE_REQUEST_NEW_SAMPLE,// Get a new thermocouple sample, task will be blocked for polling time
+    THERMOCOUPLE_REQUEST_NEW_SAMPLE,  // Get a new thermocouple sample, task will be blocked for polling time
     THERMOCOUPLE_REQUEST_TRANSMIT,    // Send the current thermocouple data over the Radio
     THERMOCOUPLE_REQUEST_DEBUG        // Send the current thermocouple data over the Debug UART
 };

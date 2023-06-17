@@ -45,12 +45,10 @@ void ThermocoupleTask::Run(void * pvParams)
 
 
     while (1) {
-
-
-
         //Every cycle, print something out (for testing)
         SOAR_PRINT("ThermocoupleTask::Run() - [%d] Seconds\n", tempSecondCounter++);
-
+        //TODO: port thermocouples
+        osDelay(1000);
     }
 }
 

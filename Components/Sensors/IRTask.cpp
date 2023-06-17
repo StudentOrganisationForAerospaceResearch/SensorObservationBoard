@@ -13,7 +13,7 @@
 /**
  * @brief Constructor for IRTask
  */
-IRTask::IRTask() : Task(FLIGHT_TASK_QUEUE_DEPTH_OBJS)
+IRTask::IRTask() : Task(IR_TASK_QUEUE_DEPTH_OBJS)
 {
 }
 
@@ -104,7 +104,7 @@ void IRTask::HandleRequestCommand(uint16_t taskCommand)
 	        break;
 	    }
 	    default:
-	        SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
+	        SOAR_PRINT("IRTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
 	        break;
 	    }
 }

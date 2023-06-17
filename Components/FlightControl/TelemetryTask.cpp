@@ -86,7 +86,5 @@ void TelemetryTask::RunLogSequence()
     LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)LOADCELL_REQUEST_NEW_SAMPLE));
     LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)LOADCELL_REQUEST_TRANSMIT));
 
-    // Thermocouples
-    // TBA
-    // IR: currently not used
+    //TODO: Thermocouples
 }
