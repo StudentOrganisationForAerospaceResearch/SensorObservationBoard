@@ -160,17 +160,8 @@ void ThermocoupleTask::ThermocoupleDebugPrint()
 
 	//thermo 1 print
 	if(dataBuffer1[1] & 0x01)
-	{								  // Returns Error Number
-		if(Error1 & 0x01){
-			SOAR_PRINT("Thermocouple 1 is not connected\n");
-		}
-		if(Error1 & 0x02){
-			SOAR_PRINT("Thermocouple 1 is shorted to GND\n");
-		}
-		if(Error1 & 0x04){
-			SOAR_PRINT("Thermocouple 1 is shorted to VCC\n");
-		}
-		SOAR_PRINT("\n");
+	{
+		SOAR_PRINT("There is an Error with Thermocouple 1 \n\n");
 	}
 	else
 	{
@@ -179,17 +170,8 @@ void ThermocoupleTask::ThermocoupleDebugPrint()
 
 	//thermo 2 print
 	if(dataBuffer2[1] & 0x01)
-	{								  // Returns Error Number
-		if(Error2 & 0x01){
-			SOAR_PRINT("Thermocouple 2 is not connected\n");
-		}
-		if(Error2 & 0x02){
-			SOAR_PRINT("Thermocouple 2 is shorted to GND\n");
-		}
-		if(Error2 & 0x04){
-			SOAR_PRINT("Thermocouple 2 is shorted to VCC\n");
-		}
-		SOAR_PRINT("\n");
+	{
+		SOAR_PRINT("There is an Error with Thermocouple 2 \n\n");
 	}
 	else
 	{
@@ -254,9 +236,9 @@ void ThermocoupleTask::SampleThermocouple()
 	HAL_Delay(10);
 	HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET); //end read with setting CS pin to high again
 
-	for(int i = 0; i<5; i++){
-		if(i!=4)
-		dataBuffer1[i] = tempDataBuffer5[i];\
+	for(int i = 0; i<4; i++){
+		dataBuffer1[i] = tempDataBuffer5[i+1];
+		SOAR_PRINT("DATABUFFERBITS[%d]: %d\n",i, tempDataBuffer5[i+1]);
 	}
 
 	int Temp1=0;
@@ -310,9 +292,9 @@ void ThermocoupleTask::SampleThermocouple()
 	HAL_Delay(10);
 	HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_SET); //end read with setting CS pin to high again
 
-	for(int i = 0; i<5; i++){
-		if(i!=4)
-		dataBuffer2[i] = tempDataBuffer5[i];
+	for(int i = 0; i<4; i++){
+		dataBuffer2[i] = tempDataBuffer5[i+1];
+		SOAR_PRINT("DATABUFFERBITS[%d]: %d\n",i, tempDataBuffer5[i+1]);
 	}
 
 	int Temp2=0;
@@ -336,5 +318,3 @@ void ThermocoupleTask::SampleThermocouple()
 		temperature2 = ERROR_TEMPURATURE_VALUE; //there is an error detected with TC2
 	}
 }
-
-

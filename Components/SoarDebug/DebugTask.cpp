@@ -16,7 +16,7 @@
 #include "IRTask.hpp"
 #include "GPIO.hpp"
 #include "stm32f4xx_hal.h"
-
+#include "ThermocoupleTask.hpp"
 #include "SOBProtocolTask.hpp"
 
 /* Macros --------------------------------------------------------------------*/
@@ -152,11 +152,10 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		SOAR_PRINT("Lowest Ever Heap Size\t: %d Bytes\n", xPortGetMinimumEverFreeHeapSize());
 		SOAR_PRINT("Debug Task Runtime  \t: %d ms\n\n", TICKS_TO_MS(xTaskGetTickCount()));
 	}
-	else if (strcmp(msg, "blinked") == 0) {
-		// Print message
-		SOAR_PRINT("Debug 'LED blink' command requested\n");
-		GPIO::LED1::On();
-		// TODO: Send to HID task to blink LED, this shouldn't delay
+	else if (strcmp(msg, "tct") == 0) {
+		SOAR_PRINT("Debug 'Thermocouple' Sampling Temperature Reading");
+		ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_NEW_SAMPLE));
+		ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_DEBUG));
 	}
 	else if (strcmp(msg, "IRTemp") == 0) {
 		// Debug command for ir temp
