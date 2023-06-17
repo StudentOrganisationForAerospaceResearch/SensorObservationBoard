@@ -33,11 +33,11 @@ Mutex Global::vaListMutex;
 */
 void run_main() {
 	// Init Tasks
-	LoadCellTask::Inst().InitTask();
 	UARTTask::Inst().InitTask();
 	DebugTask::Inst().InitTask();
 	SOBProtocolTask::Inst().InitTask();
 	TelemetryTask::Inst().InitTask();
+	LoadCellTask::Inst().InitTask();
 
 	// Print System Boot Info : Warning, don't queue more than 10 prints before scheduler starts
 	SOAR_PRINT("\n-- AVIONICS CORE --\n");

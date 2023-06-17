@@ -109,16 +109,15 @@ void DebugTask::HandleDebugMessage(const char* msg)
     //-- PARAMETRIZED COMMANDS -- (Must be first)
 	if (strncmp(msg, "lccal ", 6) == 0) {
 		// Debug command for LoadCellCalibrate()
-		// NOTE: load cell must not be calibrated with a mass greater than what is stored in a task-specific command, ie. uint16 (65536 grams)
-		// Load cell calibrate takes a known weight in grams with 2 degrees of precision (10^-2 g)
-		// Calibration value (10^-2 g) sent over the debug uart should be less than 32767
-		// Use protobuf for larger values :)
-
+		// NOTE: load cell calibration mass must be in milligrams, load cell will read/transmit in grams
 		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
-		int32_t mass = ExtractIntParameter(msg, 6);
-		if (mass != ERRVAL)
+		int32_t mass_mg = ExtractIntParameter(msg, 6);
+		if (mass_mg != ERRVAL)
 		{
-			LoadCellTask::Inst().SendCommand(Command(LOADCELL_CALIBRATE, mass));
+			// update calibration mass directly
+			LoadCellTask::Inst().SetCalibrationMassGrams((float)mass_mg / 1000);
+			// send calibration command to queue -- could be blocking if we protect the LC read
+			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATE));
 		}
 	}
 

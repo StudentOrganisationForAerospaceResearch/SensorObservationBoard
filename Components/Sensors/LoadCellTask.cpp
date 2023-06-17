@@ -8,7 +8,7 @@
 #include "LoadCellTask.hpp"
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
-
+#include "SOBProtocolTask.hpp"
 
 /**
  * @brief Constructor for LoadCellTask
@@ -72,11 +72,6 @@ void LoadCellTask::HandleCommand(Command& cm)
         HandleRequestCommand(cm.GetTaskCommand());
         break;
     }
-    case LOADCELL_CALIBRATE: {
-    	calibration_mass_g = cm.GetTaskCommand() / 100.f; // adjust precision on mass from 10^-2 grams to grams
-    	LoadCellCalibrate();
-    	break;
-    }
     case TASK_SPECIFIC_COMMAND: {
         break;
     }
@@ -98,25 +93,34 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
 {
     //Switch for task specific command within DATA_COMMAND
     switch (taskCommand) {
-    case LOADCELL_REQUEST_TARE:
+    case LOADCELL_REQUEST_TARE: {
     	LoadCellTare();
     	break;
-    case LOADCELL_REQUEST_NEW_SAMPLE:
+    }
+    case LOADCELL_REQUEST_CALIBRATE: {
+       	LoadCellCalibrate();
+       	break;
+    }
+    case LOADCELL_REQUEST_NEW_SAMPLE: {
     	SampleLoadCellData();
         break;
-    case LOADCELL_REQUEST_TRANSMIT:
-        SOAR_PRINT("Stubbed: LoadCell task transmit not implemented\n");
+    }
+    case LOADCELL_REQUEST_TRANSMIT: {
+    	TransmitProtocolLoadCellData();
         break;
-    case LOADCELL_REQUEST_CALIBRATION_DEBUG_PRINT:
+    }
+    case LOADCELL_REQUEST_CALIBRATION_DEBUG: {
     	SOAR_PRINT("Load Cell offset %d \n", loadcell.offset);
     	SOAR_PRINT("Load Cell coef %d.%d \n", (int)loadcell.coef, (int)(loadcell.coef * 1000) % 1000);
     	SOAR_PRINT("Load Cell calibration weight %d.%d grams\n", (int)calibration_mass_g, abs(int(calibration_mass_g * 1000) % 1000));
     	break;
-    case LOADCELL_REQUEST_DEBUG:
+    }
+    case LOADCELL_REQUEST_DEBUG: {
         SOAR_PRINT("Load Cell read weight: %d.%d grams\n", (int)load_cell_sample.weight_g, abs(int(load_cell_sample.weight_g * 1000) % 1000));
         break;
+    }
     default:
-        SOAR_PRINT("UARTTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
+        SOAR_PRINT("LoadCellTask - Received Unsupported REQUEST_COMMAND {%d}\n", taskCommand);
         break;
     }
 }
@@ -152,4 +156,22 @@ void LoadCellTask::SampleLoadCellData()
 	uint32_t ADCdata;
 	load_cell_sample.weight_g = hx711_weight(&loadcell, 10, ADCdata);
 	load_cell_sample.timestamp_ms = HAL_GetTick();
+}
+
+void LoadCellTask::TransmitProtocolLoadCellData()
+{
+    Proto::TelemetryMessage msg;
+	msg.set_source(Proto::Node::NODE_SOB);
+	msg.set_target(Proto::Node::NODE_DMB);
+//	msg.set_message_id((uint32_t)Proto::MessageID::MSG_TELEMETRY);
+
+	Proto::LRLoadCell loadCellSample;
+	loadCellSample.set_rocket_mass(load_cell_sample.weight_g);
+	msg.set_lr(loadCellSample);
+
+	EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> writeBuffer;
+	msg.serialize(writeBuffer);
+
+    // Send the load cell data
+    SOBProtocolTask::SendProtobufMessage(writeBuffer, Proto::MessageID::MSG_TELEMETRY);
 }

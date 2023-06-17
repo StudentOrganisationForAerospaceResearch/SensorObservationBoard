@@ -8,6 +8,7 @@
 
 #include "FlightTask.hpp"
 #include "ReadBufferFixedSize.h"
+#include "LoadCellTask.hpp"
 
 /**
  * @brief Initialize the SOBProtocolTask
@@ -58,10 +59,25 @@ void SOBProtocolTask::HandleProtobufCommandMessage(EmbeddedProto::ReadBufferFixe
     // Process the SOB command
     switch (msg.get_sob_command().get_command_enum())
     {
-    case Proto::SOBCommand::Command::SOB_TARE_LOAD_CELL:
+    case Proto::SOBCommand::Command::SOB_TARE_LOAD_CELL: {
         SOAR_PRINT("PROTO-INFO: Received SOB Tare Load Cell Command\n");
-        //TODO: Send to whatever controls this / call directly if its non-blocking
+        LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)LOADCELL_REQUEST_TARE));
         break;
+    }
+    case Proto::SOBCommand::Command::SOB_CALIBRATE_LOAD_CELL: {
+        SOAR_PRINT("PROTO-INFO: Received SOB Calibrate Load Cell Command\n");
+
+		// update calibration mass directly
+        int32_t mass_mg = msg.get_sob_command().get_command_param();
+		LoadCellTask::Inst().SetCalibrationMassGrams((float)mass_mg / 1000);
+
+		// send calibration command to queue -- could be blocking if we protect the LC read
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATE));
+		break;
+    }
+    case Proto::SOBCommand::Command::SOB_SLOW_SAMPLE_IR:
+    case Proto::SOBCommand::Command::SOB_FAST_SAMPLE_IR:
+    case Proto::SOBCommand::Command::SOB_LAST:
     default:
         break;
     }

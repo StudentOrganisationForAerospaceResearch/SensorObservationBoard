@@ -17,14 +17,13 @@
 /* Enums -----------------------------------------------------------------*/
 enum GLOBAL_COMMANDS : uint8_t
 {
-	COMMAND_NONE = 0,		// No command, packet can probably be ignored
-	TASK_SPECIFIC_COMMAND,	// Runs a task specific command when given this object
-	DATA_COMMAND,			// Data command, used to send data to a task. Target is stored in taskCommand
-    CONTROL_ACTION,			// Control actions, used in Rocket State Machine, direct translation to RCU<->DMB Protocol
+	COMMAND_NONE = 0,			// No command, packet can probably be ignored
+	TASK_SPECIFIC_COMMAND,		// Runs a task specific command when given this object
+	DATA_COMMAND,				// Data command, used to send data to a task. Target is stored in taskCommand
+    CONTROL_ACTION,				// Control actions, used in Rocket State Machine, direct translation to RCU<->DMB Protocol
 	REQUEST_COMMAND,			// Request command
-    LOADCELL_CALIBRATE,         // Load cell calibration with known mass command
     PROTOCOL_COMMAND,           // Protocol command, used for commands to the Protocol Task
-    TELEMETRY_CHANGE_PERIOD    // Command to change log period, provide the logging period in MS as the task command
+    TELEMETRY_CHANGE_PERIOD     // Command to change log period, provide the logging period in MS as the task command
 };
 
 /* Class -----------------------------------------------------------------*/

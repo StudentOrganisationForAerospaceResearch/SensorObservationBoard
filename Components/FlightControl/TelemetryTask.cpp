@@ -9,6 +9,7 @@
 #include "SystemDefines.hpp"
 #include "SOBProtocolTask.hpp"
 #include "FlightTask.hpp"
+#include "LoadCellTask.hpp"
 
 /**
  * @brief Constructor for TelemetryTask
@@ -81,8 +82,11 @@ void TelemetryTask::HandleCommand(Command& cm)
  */
 void TelemetryTask::RunLogSequence()
 {
-    //TODO: This is just an example of what to put here, add any sensors that need sample/transmit commands or direct-calls here
-//	// Barometer
-//    BarometerTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)BARO_REQUEST_NEW_SAMPLE));
-//    BarometerTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)BARO_REQUEST_TRANSMIT));
+	// Load Cell
+    LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)LOADCELL_REQUEST_NEW_SAMPLE));
+    LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)LOADCELL_REQUEST_TRANSMIT));
+
+    // Thermocouples
+    // TBA
+    // IR: currently not used
 }
