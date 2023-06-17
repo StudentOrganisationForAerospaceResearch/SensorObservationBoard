@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "main_avionics.hpp"
+#include "RunInterface.hpp"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -111,7 +111,7 @@ int main(void)
   MX_UART5_Init();
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
-  run_main();
+  run_interface();
 	#if 0
   /* USER CODE END 2 */
 
@@ -422,7 +422,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LC_CLK_Pin|GPIO_PIN_8, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LC_CLK_Pin|BUS_MODE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LC_DATA_GPIO_Port, LC_DATA_Pin, GPIO_PIN_RESET);
@@ -462,8 +462,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LC_CLK_Pin PA8 */
-  GPIO_InitStruct.Pin = LC_CLK_Pin|GPIO_PIN_8;
+  /*Configure GPIO pins : LC_CLK_Pin BUS_MODE_Pin */
+  GPIO_InitStruct.Pin = LC_CLK_Pin|BUS_MODE_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

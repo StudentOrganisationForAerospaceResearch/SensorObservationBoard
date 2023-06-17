@@ -17,6 +17,8 @@
 #include "GPIO.hpp"
 #include "stm32f4xx_hal.h"
 
+#include "SOBProtocolTask.hpp"
+
 /* Macros --------------------------------------------------------------------*/
 
 /* Structs -------------------------------------------------------------------*/
@@ -38,6 +40,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
 {
 	if (huart->Instance == SystemHandles::UART_Debug->Instance)
 		DebugTask::Inst().InterruptRxData();
+	else if(huart->Instance == SystemHandles::UART_Protocol->Instance)
+	    SOBProtocolTask::Inst().InterruptRxData();
 }
 
 /* Functions -----------------------------------------------------------------*/

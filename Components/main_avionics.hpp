@@ -30,37 +30,29 @@ namespace Global
 /* System Handles ------------------------------------------------------------------*/
 /* This should be the only place externs are allowed -------------------------------*/
 //UART Handles
-extern UART_HandleTypeDef huart1;   // UART1 - Launch Systems  ... Confirm
-extern UART_HandleTypeDef huart2;   // UART2 - Logging (Radio)
-extern UART_HandleTypeDef huart4;   // UART4 - GPS
+extern UART_HandleTypeDef huart1;   // UART1 - RS485 - HALF DUPLEX FOR NOW!! SCHEMATIC WRONG NAME
 extern UART_HandleTypeDef huart5;   // UART5 - Debug
 
 
 //I2C Handles
-extern I2C_HandleTypeDef hi2c1;      // I2C1 -- EEPROM (? - Do we still have an I2C EEPROM)
-
+extern I2C_HandleTypeDef hi2c1;      // I2C1 -- Infrared Temperature Sensor
 
 //CRC Handles
 extern CRC_HandleTypeDef hcrc;       // CRC - Hardware CRC System Handle
 
 //DMA Handles
-extern DMA_HandleTypeDef hdma_uart4_rx; // DMA UART 4 RX -
 extern DMA_HandleTypeDef hdma_uart5_rx; // DMA UART 5 RX -
 extern DMA_HandleTypeDef hdma_uart5_tx; // DMA UART 5 TX -
 
 namespace SystemHandles {
 	// Aliases
-	constexpr UART_HandleTypeDef* UART_LaunchSystems = &huart1;
-	constexpr UART_HandleTypeDef* UART_Radio = &huart2;
-	constexpr UART_HandleTypeDef* UART_GPS = &huart4;
+	constexpr UART_HandleTypeDef* UART_Protocol = &huart1;
 	constexpr UART_HandleTypeDef* UART_Debug = &huart5;
 
 	constexpr I2C_HandleTypeDef* I2C_IR = &hi2c1;
-
 	constexpr CRC_HandleTypeDef* CRC_Handle = &hcrc;
 
 	// DMA Aliases
-
 }
 
 #endif /* AVIONICS_INCLUDE_SOAR_MAIN_H */

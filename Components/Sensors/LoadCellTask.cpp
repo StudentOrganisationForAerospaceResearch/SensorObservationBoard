@@ -5,7 +5,7 @@
  ******************************************************************************
 */
 #include <stdlib.h>
-#include <Sensors/Inc/LoadCellTask.hpp>
+#include "LoadCellTask.hpp"
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
 
