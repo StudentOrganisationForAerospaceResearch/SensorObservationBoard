@@ -57,34 +57,25 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define RADIO_UART_TX_Pin GPIO_PIN_2
-#define RADIO_UART_TX_GPIO_Port GPIOA
-#define RADIO_UART_RX_Pin GPIO_PIN_3
-#define RADIO_UART_RX_GPIO_Port GPIOA
-#define Clk_pin_Pin GPIO_PIN_9
-#define Clk_pin_GPIO_Port GPIOD
-#define Data_pin_Pin GPIO_PIN_10
-#define Data_pin_GPIO_Port GPIOD
-#define LED_1_Pin GPIO_PIN_12
-#define LED_1_GPIO_Port GPIOD
-#define LED_2_Pin GPIO_PIN_14
-#define LED_2_GPIO_Port GPIOD
-#define LED_3_Pin GPIO_PIN_15
-#define LED_3_GPIO_Port GPIOD
-#define DEBUG_UART_TX_Pin GPIO_PIN_6
-#define DEBUG_UART_TX_GPIO_Port GPIOC
-#define DEBUG_UART_RX_Pin GPIO_PIN_7
-#define DEBUG_UART_RX_GPIO_Port GPIOC
-#define GPS_UART_TX_Pin GPIO_PIN_9
-#define GPS_UART_TX_GPIO_Port GPIOA
-#define GPS_UART_RX_Pin GPIO_PIN_10
-#define GPS_UART_RX_GPIO_Port GPIOA
-#define CS_Pin GPIO_PIN_4
-#define CS_GPIO_Port GPIOB
+#define AUX2_Pin GPIO_PIN_2
+#define AUX2_GPIO_Port GPIOC
+#define AUX1_Pin GPIO_PIN_3
+#define AUX1_GPIO_Port GPIOC
+#define LC_CLK_Pin GPIO_PIN_6
+#define LC_CLK_GPIO_Port GPIOA
+#define LC_DATA_Pin GPIO_PIN_8
+#define LC_DATA_GPIO_Port GPIOC
+#define BUS_MODE_Pin GPIO_PIN_8
+#define BUS_MODE_GPIO_Port GPIOA
 #define CS1_Pin GPIO_PIN_5
 #define CS1_GPIO_Port GPIOB
-#define MEM_WP_Pin GPIO_PIN_6
-#define MEM_WP_GPIO_Port GPIOB
+#define IR_CLK_Pin GPIO_PIN_6
+#define IR_CLK_GPIO_Port GPIOB
+#define IR_DATA_Pin GPIO_PIN_7
+#define IR_DATA_GPIO_Port GPIOB
+#define CS_Pin GPIO_PIN_9
+#define CS_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

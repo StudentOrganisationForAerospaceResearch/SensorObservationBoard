@@ -14,12 +14,18 @@
 /* Macros/Enums ------------------------------------------------------------*/
 enum IR_TASK_COMMANDS {
     IR_NONE = 0,
-    IR_REQUEST_NEW_SAMPLE,// Get a new barometer sample, task will be blocked for polling time
+    IR_REQUEST_NEW_SAMPLE,  // Get a new IR sample, task will be blocked for polling time
     IR_REQUEST_TRANSMIT,    // Send the current barometer data over the Radio
-    IR_REQUEST_DEBUG,        // Send the current barometer data over the Debug UART
-	IR_REQUEST_TIMESTAMP, 	// Get timestamp for IR sensors
+    IR_REQUEST_DEBUG,       // Send the current barometer data over the Debug UART
 };
 
+
+struct IRSample {
+	float object_temp;
+	float ambient_temp;
+	uint32_t timestamp;
+
+};
 
 class IRTask : public Task
 {
@@ -39,11 +45,7 @@ protected:
     void HandleRequestCommand(uint16_t taskCommand);
 
     void SampleIRTemperature();
-    float objectTemp;
-    float ambientTemp;
-    uint32_t timestampIR;
-
-
+    IRSample irSample;
 
 private:
     // Private Functions

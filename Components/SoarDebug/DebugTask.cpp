@@ -12,9 +12,12 @@
 #include <cstring>
 
 #include "FlightTask.hpp"
+#include "LoadCellTask.hpp"
 #include "IRTask.hpp"
 #include "GPIO.hpp"
 #include "stm32f4xx_hal.h"
+
+#include "SOBProtocolTask.hpp"
 
 /* Macros --------------------------------------------------------------------*/
 
@@ -37,6 +40,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
 {
 	if (huart->Instance == SystemHandles::UART_Debug->Instance)
 		DebugTask::Inst().InterruptRxData();
+	else if(huart->Instance == SystemHandles::UART_Protocol->Instance)
+	    SOBProtocolTask::Inst().InterruptRxData();
 }
 
 /* Functions -----------------------------------------------------------------*/
@@ -101,8 +106,42 @@ void DebugTask::Run(void * pvParams)
  */
 void DebugTask::HandleDebugMessage(const char* msg)
 {
+    //-- PARAMETRIZED COMMANDS -- (Must be first)
+	if (strncmp(msg, "lccal ", 6) == 0) {
+		// Debug command for LoadCellCalibrate()
+		// NOTE: load cell calibration mass must be in milligrams, load cell will read/transmit in grams
+		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
+		int32_t mass_mg = ExtractIntParameter(msg, 6);
+		if (mass_mg != ERRVAL && mass_mg != 0)
+		{
+			// update calibration mass directly
+			LoadCellTask::Inst().SetCalibrationMassGrams((float)mass_mg / 1000);
+			// send calibration command to queue -- could be blocking if we protect the LC read
+			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATE));
+		}
+	}
+
 	//-- SYSTEM / CHAR COMMANDS -- (Must be last)
-	if (strcmp(msg, "sysreset") == 0) {
+	else if (strcmp(msg, "lctare") == 0) {
+		// Debug command for LoadCellTare()
+		SOAR_PRINT("Debug 'Load Cell Tare' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_TARE));
+	}
+	else if (strcmp(msg, "lcweigh") == 0) {
+		// Debug command for SampleLoadCellData()
+		SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DEBUG));
+	}
+	else if (strcmp(msg, "lccaldebug") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Calibration Debug' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATION_DEBUG));
+	}
+	else if (strcmp(msg, "lcdebug") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Sample Debug' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DEBUG));
+	}
+	else if (strcmp(msg, "sysreset") == 0) {
 		// Reset the system
 		SOAR_ASSERT(false, "System reset requested");
 	}
@@ -118,6 +157,12 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		SOAR_PRINT("Debug 'LED blink' command requested\n");
 		GPIO::LED1::On();
 		// TODO: Send to HID task to blink LED, this shouldn't delay
+	}
+	else if (strcmp(msg, "IRTemp") == 0) {
+		// Debug command for ir temp
+		SOAR_PRINT("Debug 'IRTemp sample and read' command requested\n");
+		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE));
+		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_DEBUG));
 	}
 	else if (strcmp(msg, "irtemp") == 0)
 	{

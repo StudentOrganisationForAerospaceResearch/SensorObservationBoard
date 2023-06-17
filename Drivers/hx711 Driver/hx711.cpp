@@ -68,6 +68,7 @@ int32_t hx711_value(hx711_t *hx711)
     if(HAL_GetTick() - startTime > 150)
       return 0;
   }
+  //NOTE: Bitbanging routine, may have to stop interrupts here
   for(int8_t i=0; i<24 ; i++)
   {
     HAL_GPIO_WritePin(hx711->clk_gpio, hx711->clk_pin, GPIO_PIN_SET);
@@ -83,6 +84,7 @@ int32_t hx711_value(hx711_t *hx711)
   hx711_delay_us();
   HAL_GPIO_WritePin(hx711->clk_gpio, hx711->clk_pin, GPIO_PIN_RESET);
   hx711_delay_us();
+  //NOTE: may have to enable interrupts here
   return data;
 }
 //#############################################################################################
@@ -121,7 +123,7 @@ void hx711_calibration(hx711_t *hx711, int32_t noload_raw, int32_t load_raw, flo
   hx711_unlock(hx711);
 }
 //#############################################################################################
-float hx711_weight(hx711_t *hx711, uint16_t sample)
+float hx711_weight(hx711_t *hx711, uint16_t sample, uint32_t& ADCdata)
 {
   hx711_lock(hx711);
   int64_t  ave = 0;
@@ -130,7 +132,8 @@ float hx711_weight(hx711_t *hx711, uint16_t sample)
     ave += hx711_value(hx711);
     hx711_delay(5);
   }
-  int32_t data = (int32_t)(ave / sample);
+  ADCdata = (int32_t)(ave / sample);
+  uint32_t data = (int32_t)(ave / sample);
   float answer =  (data - hx711->offset) / hx711->coef;
   hx711_unlock(hx711);
   return answer;
@@ -144,6 +147,12 @@ void hx711_coef_set(hx711_t *hx711, float coef)
 float hx711_coef_get(hx711_t *hx711)
 {
   return hx711->coef;
+}
+//#############################################################################################
+void hx711_reset_coef_offset(hx711_t *hx711)
+{
+	hx711->coef = 0;
+	hx711->offset = 0;
 }
 //#############################################################################################
 void hx711_power_down(hx711_t *hx711)
