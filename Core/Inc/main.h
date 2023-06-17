@@ -69,10 +69,10 @@ void Error_Handler(void);
 #define BUS_MODE_GPIO_Port GPIOA
 #define CS1_Pin GPIO_PIN_5
 #define CS1_GPIO_Port GPIOB
-#define I2C_CLK_Pin GPIO_PIN_6
-#define I2C_CLK_GPIO_Port GPIOB
-#define I2C_DATA_Pin GPIO_PIN_7
-#define I2C_DATA_GPIO_Port GPIOB
+#define IR_CLK_Pin GPIO_PIN_6
+#define IR_CLK_GPIO_Port GPIOB
+#define IR_DATA_Pin GPIO_PIN_7
+#define IR_DATA_GPIO_Port GPIOB
 #define CS_Pin GPIO_PIN_9
 #define CS_GPIO_Port GPIOB
 
