@@ -11,7 +11,7 @@
 #include "DebugTask.hpp"
 #include "Task.hpp"
 
-#include "TelemetryMessage.hpp"
+//#include "TelemetryMessage.hpp"
 //#include "PIRxProtocolTask.hpp"
 
 /* Macros --------------------------------------------------------------------*/
@@ -33,7 +33,7 @@ constexpr int CMD_TIMEOUT = 150;
 /**
  * @brief Default constructor
  */
-ThermocoupleTask::ThermocoupleTask() : Task(TASK_THERMOCOUPLE_QUEUE_DEPTH_OBJS)
+ThermocoupleTask::ThermocoupleTask() : Task(THERMOCOUPLE_TASK_QUEUE_DEPTH_OBJS)
 {
 	//Data is stored locally in object not using MALOC
 }
@@ -50,9 +50,9 @@ void ThermocoupleTask::InitTask()
     BaseType_t rtValue =
         xTaskCreate((TaskFunction_t)ThermocoupleTask::RunTask,
             (const char*)"ThermocoupleTask",
-            (uint16_t)TASK_THERMOCOUPLE_STACK_DEPTH_WORDS,
+            (uint16_t)THERMOCOUPLE_TASK_STACK_DEPTH_WORDS,
             (void*)this,
-            (UBaseType_t)TASK_THERMOCOUPLE_PRIORITY,
+            (UBaseType_t)THERMOCOUPLE_TASK_RTOS_PRIORITY,
             (TaskHandle_t*)&rtTaskHandle);
 
     //Ensure creation succeeded
@@ -113,7 +113,7 @@ void ThermocoupleTask::HandleRequestCommand(uint16_t taskCommand)
     	SampleThermocouple();
         break;
     case THERMOCOUPLE_REQUEST_TRANSMIT: //Sending data to PI
-        TransmitProtocolThermoData();
+        //TransmitProtocolThermoData();
         break;
     case THERMOCOUPLE_REQUEST_DEBUG: //Output TC data
         ThermocoupleDebugPrint();
@@ -128,26 +128,26 @@ void ThermocoupleTask::HandleRequestCommand(uint16_t taskCommand)
 /**
  * @brief Transmits a protocol barometer data sample
  */
-void ThermocoupleTask::TransmitProtocolThermoData()
-{
-    SOAR_PRINT("Thermocouple Task Transmit...\n");
-    //ThermocoupleDebugPrint();
-
-    Proto::TelemetryMessage msg;
-    msg.set_source(Proto::Node::NODE_RCU);
-    msg.set_target(Proto::Node::NODE_RCU);
-    msg.set_message_id((uint32_t)Proto::MessageID::MSG_TELEMETRY);
-    Proto::RCUTemp tempData;
-	tempData.set_tc1_temp(temperature1);
-	tempData.set_tc1_temp(temperature2);
-	msg.set_temprcu(tempData);
-
-    EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> writeBuffer;
-    msg.serialize(writeBuffer);
-
-    // Send the thermocouple data
-    PIRxProtocolTask::SendProtobufMessage(writeBuffer, Proto::MessageID::MSG_TELEMETRY);
-}
+//void ThermocoupleTask::TransmitProtocolThermoData()
+//{
+//    SOAR_PRINT("Thermocouple Task Transmit...\n");
+//    //ThermocoupleDebugPrint();
+//
+//    Proto::TelemetryMessage msg;
+//    msg.set_source(Proto::Node::NODE_RCU);
+//    msg.set_target(Proto::Node::NODE_RCU);
+//    msg.set_message_id((uint32_t)Proto::MessageID::MSG_TELEMETRY);
+//    Proto::RCUTemp tempData;
+//	tempData.set_tc1_temp(temperature1);
+//	tempData.set_tc1_temp(temperature2);
+//	msg.set_temprcu(tempData);
+//
+//    EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> writeBuffer;
+//    msg.serialize(writeBuffer);
+//
+//    // Send the thermocouple data
+//    PIRxProtocolTask::SendProtobufMessage(writeBuffer, Proto::MessageID::MSG_TELEMETRY);
+//}
 
 
 /**
@@ -250,7 +250,7 @@ void ThermocoupleTask::SampleThermocouple()
     //Read From Thermocouple 1 first
 	HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET); //begin read with CS pin low
 	HAL_Delay(10);
-	HAL_SPI_Receive(SystemHandles::SPI_Thermocouple1, tempDataBuffer5, 5, 1000); //Fill the data buffer with data from TC1
+	HAL_SPI_Receive(SystemHandles::SPI_Thermocouple, tempDataBuffer5, 5, 1000); //Fill the data buffer with data from TC1
 	HAL_Delay(10);
 	HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET); //end read with setting CS pin to high again
 
@@ -306,7 +306,7 @@ void ThermocoupleTask::SampleThermocouple()
 	//Read From Thermocouple 1 first
 	HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_RESET); //begin read with CS pin low
 	HAL_Delay(10);
-	HAL_SPI_Receive(SystemHandles::SPI_Thermocouple1, tempDataBuffer5, 5, 1000); //Fill the data buffer with data from TC1
+	HAL_SPI_Receive(SystemHandles::SPI_Thermocouple, tempDataBuffer5, 5, 1000); //Fill the data buffer with data from TC1
 	HAL_Delay(10);
 	HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_SET); //end read with setting CS pin to high again
 

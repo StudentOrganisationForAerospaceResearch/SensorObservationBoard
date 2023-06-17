@@ -53,7 +53,7 @@ constexpr uint16_t LOADCELL_TASK_STACK_DEPTH_WORDS = 256;		// Size of the LoadCe
 // Thermocouple Task
 constexpr uint8_t THERMOCOUPLE_TASK_RTOS_PRIORITY = 2;			// Priority of the Thermocouple task
 constexpr uint8_t THERMOCOUPLE_TASK_QUEUE_DEPTH_OBJS = 10;		// Size of the Thermocouple task queue
-constexpr uint16_t THERMOCOUPLE_TASK_STACK_DEPTH_WORDS = 256;		// Size of the Thermocouple task stack
+constexpr uint16_t THERMOCOUPLE_TASK_STACK_DEPTH_WORDS = 384;		// Size of the Thermocouple task stack
 
 // UART TASK
 constexpr uint8_t UART_TASK_RTOS_PRIORITY = 2;			// Priority of the uart task

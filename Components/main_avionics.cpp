@@ -20,6 +20,7 @@
 #include "FlightTask.hpp"
 #include "DebugTask.hpp"
 #include "IRTask.hpp"
+#include "ThermocoupleTask.hpp"
 
 
 /* Global Variables ------------------------------------------------------------------*/
@@ -31,11 +32,11 @@ Mutex Global::vaListMutex;
 */
 void run_main() {
 	// Init Tasks
-	//FlightTask::Inst().InitTask();
+	FlightTask::Inst().InitTask();
 	IRTask::Inst().InitTask();
 	UARTTask::Inst().InitTask();
 	DebugTask::Inst().InitTask();
-
+	ThermocoupleTask::Inst().InitTask();
 
 
 
