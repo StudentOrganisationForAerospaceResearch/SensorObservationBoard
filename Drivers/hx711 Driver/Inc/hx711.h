@@ -49,6 +49,7 @@ int32_t     hx711_value_ave(hx711_t *hx711, uint16_t sample);
 
 void        hx711_coef_set(hx711_t *hx711, float coef);
 float       hx711_coef_get(hx711_t *hx711);
+void		hx711_reset_coef_offset(hx711_t *hx711);
 void        hx711_calibration(hx711_t *hx711, int32_t value_noload, int32_t value_load, float scale);
 void        hx711_tare(hx711_t *hx711, uint16_t sample);
 float       hx711_weight(hx711_t *hx711, uint16_t sample, uint32_t& ADCdata);

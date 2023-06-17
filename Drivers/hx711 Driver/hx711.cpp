@@ -68,6 +68,7 @@ int32_t hx711_value(hx711_t *hx711)
     if(HAL_GetTick() - startTime > 150)
       return 0;
   }
+  //NOTE: Bitbanging routine, may have to stop interrupts here
   for(int8_t i=0; i<24 ; i++)
   {
     HAL_GPIO_WritePin(hx711->clk_gpio, hx711->clk_pin, GPIO_PIN_SET);
@@ -83,6 +84,7 @@ int32_t hx711_value(hx711_t *hx711)
   hx711_delay_us();
   HAL_GPIO_WritePin(hx711->clk_gpio, hx711->clk_pin, GPIO_PIN_RESET);
   hx711_delay_us();
+  //NOTE: may have to enable interrupts here
   return data;
 }
 //#############################################################################################
@@ -145,6 +147,12 @@ void hx711_coef_set(hx711_t *hx711, float coef)
 float hx711_coef_get(hx711_t *hx711)
 {
   return hx711->coef;
+}
+//#############################################################################################
+void hx711_reset_coef_offset(hx711_t *hx711)
+{
+	hx711->coef = 0;
+	hx711->offset = 0;
 }
 //#############################################################################################
 void hx711_power_down(hx711_t *hx711)

@@ -102,36 +102,33 @@ void DebugTask::Run(void * pvParams)
  */
 void DebugTask::HandleDebugMessage(const char* msg)
 {
-	//-- SYSTEM / CHAR COMMANDS -- (Must be last)
-	// Debug command for LoadCellCalibrate()
-	if (strncmp(msg, "LCCal ", 6) == 0) {
+    //-- PARAMETRIZED COMMANDS -- (Must be first)
+	if (strncmp(msg, "lccal ", 6) == 0) {
+		// Debug command for LoadCellCalibrate()
+		// NOTE: load cell must not be calibrated with a mass greater than what is stored in a task-specific command, ie. uint16 (65536 grams)
+		// Load cell calibrate takes a known weight in grams with 2 degrees of precision (10^-2 g)
+		// Calibration value (10^-2 g) sent over the debug uart should be less than 32767
+		// Use protobuf for larger values :)
 
 		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
-		int16_t mass = ExtractIntParameter(msg, 6);
+		int32_t mass = ExtractIntParameter(msg, 6);
 		if (mass != ERRVAL)
 		{
 			LoadCellTask::Inst().SendCommand(Command(LOADCELL_CALIBRATE, mass));
 		}
-		while (1) {
-			osDelay(1000);
-//			SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
-			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
-		}
 	}
-	// Debug command for LoadCellTare()
-	else if (strcmp(msg, "LCTare") == 0) {
 
+	//-- SYSTEM / CHAR COMMANDS -- (Must be last)
+	else if (strcmp(msg, "lctare") == 0) {
+		// Debug command for LoadCellTare()
 		SOAR_PRINT("Debug 'Load Cell Tare' command requested\n");
 		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_TARE));
-
 	}
-	// Debug command for SampleLoadCellData()
-	else if (strcmp(msg, "LCWeigh") == 0) {
-		while (1) {
-			osDelay(1000);
-//			SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
-			LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
-		}
+	else if (strcmp(msg, "lcweigh") == 0) {
+		// Debug command for SampleLoadCellData()
+		SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DEBUG));
 	}
 	else if (strcmp(msg, "sysreset") == 0) {
 		// Reset the system
@@ -144,9 +141,8 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		SOAR_PRINT("Lowest Ever Heap Size\t: %d Bytes\n", xPortGetMinimumEverFreeHeapSize());
 		SOAR_PRINT("Debug Task Runtime  \t: %d ms\n\n", TICKS_TO_MS(xTaskGetTickCount()));
 	}
-	// Debug command for ir temp
 	else if (strcmp(msg, "IRTemp") == 0) {
-
+		// Debug command for ir temp
 		SOAR_PRINT("Debug 'IRTemp sample and read' command requested\n");
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE));
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_DEBUG));

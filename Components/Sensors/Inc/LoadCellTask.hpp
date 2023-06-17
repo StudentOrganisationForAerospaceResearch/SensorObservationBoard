@@ -18,17 +18,18 @@
 /* Macros/Enums ------------------------------------------------------------*/
 enum LOADCELL_TASK_COMMANDS {
     LOADCELL_NONE = 0,
-	LOADCELL_REQUEST_TARE,		  // Send the current load cell data during tare over the Debug UART
-	LOADCELL_REQUEST_CALIBRATE,   // Send the current load cell data during calibration over the Debug UART
-    LOADCELL_REQUEST_NEW_SAMPLE,  // Get a new load cell sample, task will be blocked for polling time
-    LOADCELL_REQUEST_TRANSMIT,    // Send the current load cell data over the Radio
-    LOADCELL_REQUEST_DEBUG        // Send the current load cell data over the Debug UART
+	LOADCELL_REQUEST_TARE,		  			  // Send the current load cell data during tare over the Debug UART
+	LOADCELL_REQUEST_CALIBRATE,   			  // Calibrate load cell with known mass (in 10^-2 grams)
+    LOADCELL_REQUEST_NEW_SAMPLE,  			  // Get a new load cell sample, task will be blocked for polling time
+    LOADCELL_REQUEST_TRANSMIT,    			  // Send the current load cell data over the Radio
+	LOADCELL_REQUEST_CALIBRATION_DEBUG_PRINT, // Print the offset, scale, and known mass used for calibration
+    LOADCELL_REQUEST_DEBUG        			  // Send the current load cell data over the Debug UART
 };
 
 struct LoadCellSample
 {
 	float weight_g;
-	//float knownmass_lb = 16.5347; //This weight it in pounds and refers to the aluminum plate.
+	uint32_t timestamp_ms;
 };
 
 class LoadCellTask : public Task
@@ -52,20 +53,17 @@ protected:
 
     void SampleLoadCellData();
     void LoadCellTare();
-    void LoadCellCalibrate(float known_mass_g);
-    int32_t GetNoLoad() {return loadcell.offset; }
+    void LoadCellCalibrate();
 
     hx711_t loadcell;
-
-    LoadCellSample loadCellSample;
-
-
+    LoadCellSample load_cell_sample;
+    float calibration_mass_g;
 
 private:
     // Private Functions
     LoadCellTask();        // Private constructor
     LoadCellTask(const LoadCellTask&);                        // Prevent copy-construction
-    LoadCellTask& operator=(const LoadCellTask&);            // Prevent assignment
+    LoadCellTask& operator=(const LoadCellTask&);             // Prevent assignment
 };
 
 #endif    // SOAR_LOADCELLTASK_HPP_

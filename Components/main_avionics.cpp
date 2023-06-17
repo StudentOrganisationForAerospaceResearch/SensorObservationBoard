@@ -11,7 +11,6 @@
 #include "SystemDefines.hpp"
 #include "main_avionics.hpp"
 #include "stm32f4xx_hal_uart.h"
-#include "../../Drivers/mlx90614 Driver/mlx90614.h"
 #include "Mutex.hpp"
 #include "Command.hpp"
 
