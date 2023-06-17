@@ -28,6 +28,7 @@
 
 #include "cmsis_os.h"	// CMSIS RTOS definitions
 #include "main_avionics.hpp"  // Main avionics definitions
+#include "stm32f4xx_hal.h"	 // HAL definitions
 #include "Utils.hpp"	// Utility functions
 
 /* Task Definitions ------------------------------------------------------------------*/
@@ -40,26 +41,37 @@ constexpr uint16_t FLIGHT_TASK_STACK_DEPTH_WORDS = 256;		// Size of the flight t
 
 constexpr uint16_t FLIGHT_PHASE_DISPLAY_FREQ = 1000;	// Display frequency for flight phase information
 
+// IR Task
+constexpr uint8_t IR_TASK_RTOS_PRIORITY = 2;			// Priority of the IR task
+constexpr uint8_t IR_TASK_QUEUE_DEPTH_OBJS = 10;		// Size of the IR task queue
+constexpr uint16_t IR_TASK_STACK_DEPTH_WORDS = 512;		// Size of the IR task stack
+
+// LoadCell Task
+constexpr uint8_t LOADCELL_TASK_RTOS_PRIORITY = 2;			// Priority of the LoadCell task
+constexpr uint8_t LOADCELL_TASK_QUEUE_DEPTH_OBJS = 10;		// Size of the LoadCell task queue
+constexpr uint16_t LOADCELL_TASK_STACK_DEPTH_WORDS = 512;	// Size of the LoadCell task stack
+
+// Thermocouple Task
+constexpr uint8_t THERMOCOUPLE_TASK_RTOS_PRIORITY = 2;			// Priority of the Thermocouple task
+constexpr uint8_t THERMOCOUPLE_TASK_QUEUE_DEPTH_OBJS = 10;		// Size of the Thermocouple task queue
+constexpr uint16_t THERMOCOUPLE_TASK_STACK_DEPTH_WORDS = 512;	// Size of the Thermocouple task stack
+
 // UART TASK
 constexpr uint8_t UART_TASK_RTOS_PRIORITY = 2;			// Priority of the uart task
 constexpr uint8_t UART_TASK_QUEUE_DEPTH_OBJS = 10;		// Size of the uart task queue
 constexpr uint16_t UART_TASK_STACK_DEPTH_WORDS = 256;	// Size of the uart task stack
 
 // DEBUG TASK
-constexpr uint8_t TASK_DEBUG_PRIORITY = 2;			// Priority of the debug task
+constexpr uint8_t TASK_DEBUG_PRIORITY = 2;				// Priority of the debug task
 constexpr uint8_t TASK_DEBUG_QUEUE_DEPTH_OBJS = 10;		// Size of the debug task queue
-constexpr uint16_t TASK_DEBUG_STACK_DEPTH_WORDS = 256;		// Size of the debug task stack
+constexpr uint16_t TASK_DEBUG_STACK_DEPTH_WORDS = 256;	// Size of the debug task stack
 
-// BAROMETER TASK
-constexpr uint8_t TASK_BAROMETER_PRIORITY = 2;			// Priority of the barometer task
-constexpr uint8_t TASK_BAROMETER_QUEUE_DEPTH_OBJS = 10;		// Size of the barometer task queue
-constexpr uint16_t TASK_BAROMETER_STACK_DEPTH_WORDS = 256;		// Size of the barometer task stack
+// TELEMETRY Task
+constexpr uint8_t TELEMETRY_TASK_RTOS_PRIORITY = 2;            // Priority of the telemetry task
+constexpr uint8_t TELEMETRY_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the telemetry task queue
+constexpr uint16_t TELEMETRY_TASK_STACK_DEPTH_WORDS = 512;     // Size of the telemetry task stack
 
-// IMU TASK (ACCEL/GYRO/MAGNETO)
-constexpr uint8_t TASK_IMU_PRIORITY = 2;			// Priority of the barometer task
-constexpr uint8_t TASK_IMU_QUEUE_DEPTH_OBJS = 10;		// Size of the barometer task queue
-constexpr uint16_t TASK_IMU_STACK_DEPTH_WORDS = 256;		// Size of the barometer task stack
-
+constexpr uint32_t TELEMETRY_DEFAULT_LOGGING_RATE_MS = 1000; // Default logging delay for telemetry task
 
 
 /* System Defines ------------------------------------------------------------------*/
