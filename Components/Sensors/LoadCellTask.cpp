@@ -111,7 +111,7 @@ void LoadCellTask::HandleRequestCommand(uint16_t taskCommand)
     }
     case LOADCELL_REQUEST_CALIBRATION_DEBUG: {
     	SOAR_PRINT("Load Cell offset %d \n", loadcell.offset);
-    	SOAR_PRINT("Load Cell coef %d.%d \n", (int)loadcell.coef, (int)(loadcell.coef * 1000) % 1000);
+    	SOAR_PRINT("Load Cell coef %d.%d \n", (int)loadcell.coef, abs(int(loadcell.coef * 1000) % 1000));
     	SOAR_PRINT("Load Cell calibration weight %d.%d grams\n", (int)calibration_mass_g, abs(int(calibration_mass_g * 1000) % 1000));
     	break;
     }
@@ -134,6 +134,7 @@ void LoadCellTask::LoadCellTare()
 {
 	hx711_reset_coef_offset(&loadcell);
 	hx711_tare(&loadcell, 10);
+	SOAR_PRINT("Load Cell offset %d \n", loadcell.offset);
 }
 /**
  * @brief Calculates the calibration coefficient for calibration with a known mass.
@@ -142,8 +143,14 @@ void LoadCellTask::LoadCellTare()
  */
 void LoadCellTask::LoadCellCalibrate()
 {
+	if (calibration_mass_g <= 0) {
+		SOAR_PRINT("Load Cell requires positive, nonzero calibration weight\n");
+		return;
+	}
+
 	int32_t load_raw = hx711_value_ave(&loadcell, 10);
 	hx711_calibration(&loadcell, loadcell.offset, load_raw, calibration_mass_g);
+	SOAR_PRINT("Load Cell coef %d.%d \n", (int)loadcell.coef, abs(int(loadcell.coef * 1000) % 1000));
 }
 
 /**

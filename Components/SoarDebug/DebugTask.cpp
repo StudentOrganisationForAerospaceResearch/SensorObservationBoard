@@ -112,7 +112,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		// NOTE: load cell calibration mass must be in milligrams, load cell will read/transmit in grams
 		SOAR_PRINT("Debug 'Load Cell Calibrate' command requested\n");
 		int32_t mass_mg = ExtractIntParameter(msg, 6);
-		if (mass_mg != ERRVAL)
+		if (mass_mg != ERRVAL && mass_mg != 0)
 		{
 			// update calibration mass directly
 			LoadCellTask::Inst().SetCalibrationMassGrams((float)mass_mg / 1000);
@@ -131,6 +131,14 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		// Debug command for SampleLoadCellData()
 		SOAR_PRINT("Debug 'Load Cell Weigh' command requested\n");
 		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_NEW_SAMPLE));
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DEBUG));
+	}
+	else if (strcmp(msg, "lccaldebug") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Calibration Debug' command requested\n");
+		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATION_DEBUG));
+	}
+	else if (strcmp(msg, "lcdebug") == 0) {
+		SOAR_PRINT("Debug 'Load Cell Sample Debug' command requested\n");
 		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_DEBUG));
 	}
 	else if (strcmp(msg, "sysreset") == 0) {
