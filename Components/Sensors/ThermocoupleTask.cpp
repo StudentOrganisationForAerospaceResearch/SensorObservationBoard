@@ -11,8 +11,8 @@
 #include "DebugTask.hpp"
 #include "Task.hpp"
 
-//#include "TelemetryMessage.hpp"
-//#include "PIRxProtocolTask.hpp"
+#include "TelemetryMessage.hpp"
+#include "SOBProtocolTask.hpp"
 
 /* Macros --------------------------------------------------------------------*/
 
@@ -128,26 +128,26 @@ void ThermocoupleTask::HandleRequestCommand(uint16_t taskCommand)
 /**
  * @brief Transmits a protocol barometer data sample
  */
-//void ThermocoupleTask::TransmitProtocolThermoData()
-//{
-//    SOAR_PRINT("Thermocouple Task Transmit...\n");
-//    //ThermocoupleDebugPrint();
-//
-//    Proto::TelemetryMessage msg;
-//    msg.set_source(Proto::Node::NODE_RCU);
-//    msg.set_target(Proto::Node::NODE_RCU);
-//    msg.set_message_id((uint32_t)Proto::MessageID::MSG_TELEMETRY);
-//    Proto::RCUTemp tempData;
-//	tempData.set_tc1_temp(temperature1);
-//	tempData.set_tc1_temp(temperature2);
-//	msg.set_temprcu(tempData);
-//
-//    EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> writeBuffer;
-//    msg.serialize(writeBuffer);
-//
-//    // Send the thermocouple data
-//    PIRxProtocolTask::SendProtobufMessage(writeBuffer, Proto::MessageID::MSG_TELEMETRY);
-//}
+void ThermocoupleTask::TransmitProtocolThermoData()
+{
+    SOAR_PRINT("Thermocouple Task Transmit...\n");
+    //ThermocoupleDebugPrint();
+
+    Proto::TelemetryMessage msg;
+    msg.set_source(Proto::Node::NODE_SOB);
+    msg.set_target(Proto::Node::NODE_RCU);
+    msg.set_message_id((uint32_t)Proto::MessageID::MSG_TELEMETRY);
+    Proto::SOBTemp tempData;
+	tempData.set_tc1_temp(temperature1);
+	tempData.set_tc2_temp(temperature2);
+	msg.set_tempsob(tempData);
+
+    EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> writeBuffer;
+    msg.serialize(writeBuffer);
+
+    // Send the thermocouple data
+    SOBProtocolTask::SendProtobufMessage(writeBuffer, Proto::MessageID::MSG_TELEMETRY);
+}
 
 
 /**
