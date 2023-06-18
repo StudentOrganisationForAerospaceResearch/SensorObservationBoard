@@ -238,7 +238,7 @@ void ThermocoupleTask::SampleThermocouple()
 
 	for(int i = 0; i<4; i++){
 		dataBuffer1[i] = tempDataBuffer5[i+1];
-		SOAR_PRINT("DATABUFFERBITS[%d]: %d\n",i, tempDataBuffer5[i+1]);
+		//SOAR_PRINT("DATABUFFERBITS[%d]: %d\n",i, tempDataBuffer5[i+1]);
 	}
 
 	int Temp1=0;
@@ -294,7 +294,7 @@ void ThermocoupleTask::SampleThermocouple()
 
 	for(int i = 0; i<4; i++){
 		dataBuffer2[i] = tempDataBuffer5[i+1];
-		SOAR_PRINT("DATABUFFERBITS[%d]: %d\n",i, tempDataBuffer5[i+1]);
+		//SOAR_PRINT("DATABUFFERBITS[%d]: %d\n",i, tempDataBuffer5[i+1]);
 	}
 
 	int Temp2=0;
