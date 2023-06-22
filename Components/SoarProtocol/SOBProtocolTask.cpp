@@ -89,7 +89,25 @@ void SOBProtocolTask::HandleProtobufCommandMessage(EmbeddedProto::ReadBufferFixe
  */
 void SOBProtocolTask::HandleProtobufControlMesssage(EmbeddedProto::ReadBufferFixedSize<PROTOCOL_RX_BUFFER_SZ_BYTES>& readBuffer)
 {
+    Proto::ControlMessage msg;
+    msg.deserialize(readBuffer);
 
+    // Verify the source and target nodes, if they aren't as expected, do nothing
+    if (msg.get_source() != Proto::Node::NODE_RCU || msg.get_target() != Proto::Node::NODE_SOB)
+        return;
+
+    if (msg.has_ping()) {
+        // This is a ping message, respond with an ack
+        Proto::ControlMessage ackResponse;
+        Proto::AckNack ack;
+        ack.set_acking_msg_id(msg.get_message_id());
+        ack.set_acking_msg_source(msg.get_source());
+        ack.set_acking_sequence_num(msg.get_source_sequence_num());
+        ackResponse.set_ack(ack);
+        EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> writeBuf;
+        ackResponse.serialize(writeBuf);
+        SOBProtocolTask::SendProtobufMessage(writeBuf, Proto::MessageID::MSG_CONTROL);
+    }
 }
 
 /**
