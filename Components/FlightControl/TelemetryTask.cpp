@@ -10,6 +10,7 @@
 #include "SOBProtocolTask.hpp"
 #include "FlightTask.hpp"
 #include "LoadCellTask.hpp"
+#include "ThermocoupleTask.hpp"
 
 /**
  * @brief Constructor for TelemetryTask
@@ -85,6 +86,10 @@ void TelemetryTask::RunLogSequence()
 	// Load Cell
     LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)LOADCELL_REQUEST_NEW_SAMPLE));
     LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)LOADCELL_REQUEST_TRANSMIT));
+
+    // Thermocouple
+    ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_NEW_SAMPLE));
+	ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_TRANSMIT));
 
     //TODO: Thermocouples
 }
