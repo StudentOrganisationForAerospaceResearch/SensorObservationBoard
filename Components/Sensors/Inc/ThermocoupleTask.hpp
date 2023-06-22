@@ -17,7 +17,7 @@
 
 /* Macros/Enums ------------------------------------------------------------*/
 enum THERMOCOUPLE_TASK_COMMANDS {
-	THERMOCOUPLE_NULL = 0,
+	THERMOCOUPLE_NONE= 0,
 	THERMOCOUPLE_REQUEST_NEW_SAMPLE,	// Get a new temperature sample
 	THERMOCOUPLE_REQUEST_TRANSMIT,		// Send the current temperature over the Protobuff
 	THERMOCOUPLE_REQUEST_DEBUG       	// Send the current temperature data over the Debug UART
