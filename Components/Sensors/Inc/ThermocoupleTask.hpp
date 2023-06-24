@@ -1,24 +1,29 @@
 /**
  ******************************************************************************
- * File Name          : ThermoCoupleTask.hpp
- * Description        : Primary Thermocouple task, default task for the system.
+ * File Name          : Thermocouple.hpp
+ * Description        : TermcoupleTask contains termpurature data along with functions to
+ * 						read the thermocouples, transmit the tempuature data,
+ * 						and send a debug message to a terminal
  ******************************************************************************
 */
-#ifndef SOAR_THERMOCOUPLETASK_HPP_
-#define SOAR_THERMOCOUPLETASK_HPP_
+
+#ifndef SOAR_SENSOR_THERMOCOUPLE_TASK_HPP_
+#define SOAR_SENSOR_THERMOCOUPLE_TASK_HPP_
+
+/* Includes ------------------------------------------------------------------*/
+
 #include "Task.hpp"
 #include "SystemDefines.hpp"
 
-
 /* Macros/Enums ------------------------------------------------------------*/
 enum THERMOCOUPLE_TASK_COMMANDS {
-    THERMOCOUPLE_NONE = 0,
-    THERMOCOUPLE_REQUEST_NEW_SAMPLE,  // Get a new thermocouple sample, task will be blocked for polling time
-    THERMOCOUPLE_REQUEST_TRANSMIT,    // Send the current thermocouple data over the Radio
-    THERMOCOUPLE_REQUEST_DEBUG        // Send the current thermocouple data over the Debug UART
+	THERMOCOUPLE_NONE= 0,
+	THERMOCOUPLE_REQUEST_NEW_SAMPLE,	// Get a new temperature sample
+	THERMOCOUPLE_REQUEST_TRANSMIT,		// Send the current temperature over the Protobuff
+	THERMOCOUPLE_REQUEST_DEBUG       	// Send the current temperature data over the Debug UART
 };
 
-
+/* Class ------------------------------------------------------------------*/
 class ThermocoupleTask : public Task
 {
 public:
@@ -32,20 +37,27 @@ public:
 protected:
     static void RunTask(void* pvParams) { ThermocoupleTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
 
-    void Run(void * pvParams); // Main run code
-
+    void Run(void* pvParams);    // Main run code
 
     void HandleCommand(Command& cm);
     void HandleRequestCommand(uint16_t taskCommand);
 
-    void SampleThermocoupleData();
+    // Sampling
+    void TransmitProtocolThermoData();
+    void SampleThermocouple();
+    void ThermocoupleDebugPrint();
+    int16_t ExtractTempurature(uint8_t temperatureData[]);
 
+    //Fields
+    uint8_t dataBuffer1[4] = {0};
+    uint8_t dataBuffer2[4] = {0};
+    int16_t temperature1 = 0;
+    int16_t temperature2 = 0;
 
 private:
-    // Private Functions
-    ThermocoupleTask();        // Private constructor
-    ThermocoupleTask(const ThermocoupleTask&);                        // Prevent copy-construction
-    ThermocoupleTask& operator=(const ThermocoupleTask&);            // Prevent assignment
+    ThermocoupleTask();                                        	// Private constructor
+    ThermocoupleTask(const ThermocoupleTask&);                  // Prevent copy-construction
+    ThermocoupleTask& operator=(const ThermocoupleTask&);       // Prevent assignment
 };
 
-#endif    // SOAR_THERMOCOUPLETASK_HPP_
+#endif 		//SOAR_SENSOR_THERMOCOUPLE_TASK_HPP_

@@ -16,7 +16,7 @@
 #include "IRTask.hpp"
 #include "GPIO.hpp"
 #include "stm32f4xx_hal.h"
-
+#include "ThermocoupleTask.hpp"
 #include "SOBProtocolTask.hpp"
 
 /* Macros --------------------------------------------------------------------*/
@@ -152,12 +152,28 @@ void DebugTask::HandleDebugMessage(const char* msg)
 		SOAR_PRINT("Lowest Ever Heap Size\t: %d Bytes\n", xPortGetMinimumEverFreeHeapSize());
 		SOAR_PRINT("Debug Task Runtime  \t: %d ms\n\n", TICKS_TO_MS(xTaskGetTickCount()));
 	}
+	else if (strcmp(msg, "tct") == 0) {
+		SOAR_PRINT("Debug 'Thermocouple' Sampling Temperature Reading");
+		ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_NEW_SAMPLE));
+		ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_DEBUG));
+	}
 	else if (strcmp(msg, "IRTemp") == 0) {
 		// Debug command for ir temp
 		SOAR_PRINT("Debug 'IRTemp sample and read' command requested\n");
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE));
 		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_DEBUG));
 	}
+	else if (strcmp(msg, "irtemp") == 0)
+	{
+		SOAR_PRINT("Debug 'IRTemp sample and read' command requested\n");
+		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_NEW_SAMPLE));
+		IRTask::Inst().SendCommand(Command(REQUEST_COMMAND, IR_REQUEST_DEBUG));
+	}
+	else if (strcmp(msg, "timestamp") == 0)
+	{
+
+	}
+
 	else {
 		// Single character command, or unknown command
 		switch (msg[0]) {

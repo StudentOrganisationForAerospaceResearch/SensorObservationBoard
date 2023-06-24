@@ -11,6 +11,7 @@
 #include "SystemDefines.hpp"
 #include "main_avionics.hpp"
 #include "stm32f4xx_hal_uart.h"
+#include "../../Drivers/mlx90614 Driver/mlx90614.h"
 #include "Mutex.hpp"
 #include "Command.hpp"
 
@@ -21,6 +22,7 @@
 #include "FlightTask.hpp"
 #include "DebugTask.hpp"
 #include "IRTask.hpp"
+#include "ThermocoupleTask.hpp"
 #include "LoadCellTask.hpp"
 
 
@@ -38,6 +40,8 @@ void run_main() {
 	SOBProtocolTask::Inst().InitTask();
 	TelemetryTask::Inst().InitTask();
 	LoadCellTask::Inst().InitTask();
+	ThermocoupleTask::Inst().InitTask();
+	FlightTask::Inst().InitTask();
 
 	// Print System Boot Info : Warning, don't queue more than 10 prints before scheduler starts
 	SOAR_PRINT("\n-- AVIONICS CORE --\n");
