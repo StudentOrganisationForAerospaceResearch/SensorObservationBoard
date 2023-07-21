@@ -51,8 +51,6 @@ void TelemetryTask::Run(void* pvParams)
 		while (qEvtQueue->Receive(cm))
             HandleCommand(cm);
 
-        osDelay(loggingDelayMs);
-        RunLogSequence();
     }
 }
 
@@ -64,10 +62,27 @@ void TelemetryTask::HandleCommand(Command& cm)
 {
     //Switch for the GLOBAL_COMMAND
     switch (cm.GetCommand()) {
-    case TELEMETRY_CHANGE_PERIOD: {
-        loggingDelayMs = (uint16_t)cm.GetTaskCommand();
+    case TELEMETRY_SEND_DATA: {
+        RunLogSequence();
 	break;
     }
+    case TELEMETRY_SEND_EOF: {
+    	SendEOF();
+    	break;
+     }
+    case TELEMETRY_LOADCELL_EOF:
+    case TELEMETRY_THERMOCOUPLE_EOF: {
+    	if(counter == 2)
+    	{
+    		SendEOF();
+    	}
+    	else
+    	{
+    		counter++;
+    	}
+     break;
+    }
+
     default:
         SOAR_PRINT("TelemetryTask - Received Unsupported Command {%d}\n", cm.GetCommand());
         break;
@@ -91,5 +106,18 @@ void TelemetryTask::RunLogSequence()
     ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_NEW_SAMPLE));
 	ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_TRANSMIT));
 
-    //TODO: Thermocouples
+}
+
+void TelemetryTask::SendEOF()
+{
+	//SOB_FAST_SAMPLE_IR for the command message
+	Proto::CommmandMessage dataEndMsg;
+	dataEndMsg.set_source(Proto::Node::NODE_SOB);
+	dataEndMsg.set_target(Proto::Node::NODE_RCU);
+	dataEndMsg.set_message_id((uint32_t)Proto::MessageID::MSG_COMMAND);
+
+	EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> dataEndWriteBuffer;
+	dataEndMsg.serialize(dataEndWriteBuffer);
+
+	SOBxProtocolTask::SendProtobufMessage(dataEndWriteBuffer, Proto::MessageID::MSG_COMMAND);
 }

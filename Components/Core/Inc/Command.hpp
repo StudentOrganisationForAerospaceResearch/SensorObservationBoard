@@ -23,7 +23,12 @@ enum GLOBAL_COMMANDS : uint8_t
     CONTROL_ACTION,				// Control actions, used in Rocket State Machine, direct translation to RCU<->DMB Protocol
 	REQUEST_COMMAND,			// Request command
     PROTOCOL_COMMAND,           // Protocol command, used for commands to the Protocol Task
-    TELEMETRY_CHANGE_PERIOD     // Command to change log period, provide the logging period in MS as the task command
+    TELEMETRY_CHANGE_PERIOD,     // Command to change log period, provide the logging period in MS as the task command
+	TELEMETRY_SEND_DATA,		// Command to indicate that we are sending data.
+	TELEMETRY_SEND_EOF,			// Command to indicate that we are EOF for data
+	TELEMETRY_LOADCELL_EOF, 	// Command to indicate that load cell protobuf has been sent
+	TELEMETRY_THERMOCOUPLE_EOF  // Command to indicate that thermocouple protobuf has sent
+
 };
 
 /* Class -----------------------------------------------------------------*/

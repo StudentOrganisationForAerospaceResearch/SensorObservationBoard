@@ -27,7 +27,7 @@
 /* Constants -----------------------------------------------------------------*/
 #define ERROR_TEMPERATURE_VALUE 9999
 #define TEMPERATURE_OFFSET 6.0 //in degrees Celsius
-#define THERMOCOUPLE_SPI_TIMEOUT 1000 //in ms
+#define THERMOCOUPLE_SPI_TIMEOUT 100 //in ms
 
 /* Values should not be modified, non-const due to HAL and C++ strictness) ---*/
 constexpr int CMD_TIMEOUT = 150;
@@ -152,6 +152,7 @@ void ThermocoupleTask::TransmitProtocolThermoData()
 
     // Send the thermocouple data
     SOBProtocolTask::SendProtobufMessage(writeBuffer, Proto::MessageID::MSG_TELEMETRY);
+    TelemetryTask::Inst().SendCommand(Command(TELEMETRY_THERMOCOUPLE_EOF));
 }
 
 
