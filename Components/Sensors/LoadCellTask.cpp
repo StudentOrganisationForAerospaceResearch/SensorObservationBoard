@@ -9,6 +9,7 @@
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
 #include "SOBProtocolTask.hpp"
+#include "TelemetryTask.hpp"
 
 /**
  * @brief Constructor for LoadCellTask

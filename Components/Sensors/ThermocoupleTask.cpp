@@ -19,6 +19,7 @@
 #include "Task.hpp"
 #include "TelemetryMessage.hpp"
 #include "SOBProtocolTask.hpp"
+#include "TelemetryTask.hpp"
 
 /* Macros --------------------------------------------------------------------*/
 

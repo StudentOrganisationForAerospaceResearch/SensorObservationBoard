@@ -48,8 +48,8 @@ extern DMA_HandleTypeDef hdma_uart5_tx; // DMA UART 5 TX -
 
 namespace SystemHandles {
 	// Aliases
-	constexpr UART_HandleTypeDef* UART_Protocol = &huart1;
-	constexpr UART_HandleTypeDef* UART_Debug = &huart5;
+	constexpr UART_HandleTypeDef* UART_Protocol = &huart5; //should be uart 1
+	constexpr UART_HandleTypeDef* UART_Debug = &huart1; //should be uart 5
 
 	constexpr SPI_HandleTypeDef* SPI_Thermocouple = &hspi3;
 

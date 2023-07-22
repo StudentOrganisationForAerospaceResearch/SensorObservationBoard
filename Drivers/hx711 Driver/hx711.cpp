@@ -133,7 +133,7 @@ float hx711_weight(hx711_t *hx711, uint16_t sample, uint32_t& ADCdata)
     hx711_delay(5);
   }
   ADCdata = (int32_t)(ave / sample);
-  uint32_t data = (int32_t)(ave / sample);
+  int32_t data = (int32_t)(ave / sample);
   float answer =  (data - hx711->offset) / hx711->coef;
   hx711_unlock(hx711);
   return answer;

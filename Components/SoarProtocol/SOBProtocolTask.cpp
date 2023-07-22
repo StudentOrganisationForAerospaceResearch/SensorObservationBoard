@@ -63,7 +63,7 @@ void SOBProtocolTask::HandleProtobufCommandMessage(EmbeddedProto::ReadBufferFixe
     case Proto::SOBCommand::Command::SOB_TARE_LOAD_CELL: {
         SOAR_PRINT("PROTO-INFO: Received SOB Tare Load Cell Command\n");
         LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)LOADCELL_REQUEST_TARE));
-        TelemetryTask::Inst().SendEOF();
+        TelemetryTask::Inst().SendCommand(Command(TELEMETRY_SEND_EOF));
         break;
     }
     case Proto::SOBCommand::Command::SOB_CALIBRATE_LOAD_CELL: {
@@ -75,7 +75,7 @@ void SOBProtocolTask::HandleProtobufCommandMessage(EmbeddedProto::ReadBufferFixe
 
 		// send calibration command to queue -- could be blocking if we protect the LC read
 		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATE));
-		TelemetryTask::Inst().SendEOF();
+		TelemetryTask::Inst().SendCommand(Command(TELEMETRY_SEND_EOF));
 		break;
     }
     case Proto::SOBCommand::Command::SOB_SLOW_SAMPLE_IR:
@@ -97,7 +97,7 @@ void SOBProtocolTask::HandleProtobufCommandMessage(EmbeddedProto::ReadBufferFixe
  */
 void SOBProtocolTask::HandleProtobufControlMesssage(EmbeddedProto::ReadBufferFixedSize<PROTOCOL_RX_BUFFER_SZ_BYTES>& readBuffer)
 {
-
+    TelemetryTask::Inst().SendCommand(Command(TELEMETRY_SEND_EOF));
 }
 
 /**
@@ -105,5 +105,5 @@ void SOBProtocolTask::HandleProtobufControlMesssage(EmbeddedProto::ReadBufferFix
  */
 void SOBProtocolTask::HandleProtobufTelemetryMessage(EmbeddedProto::ReadBufferFixedSize<PROTOCOL_RX_BUFFER_SZ_BYTES>& readBuffer)
 {
-
+    TelemetryTask::Inst().SendCommand(Command(TELEMETRY_SEND_EOF));
 }

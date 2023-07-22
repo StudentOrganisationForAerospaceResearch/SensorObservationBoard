@@ -18,6 +18,7 @@
 TelemetryTask::TelemetryTask() : Task(TELEMETRY_TASK_QUEUE_DEPTH_OBJS)
 {
     loggingDelayMs = TELEMETRY_DEFAULT_LOGGING_RATE_MS;
+    counter = 0;
 }
 
 /**
@@ -45,6 +46,7 @@ void TelemetryTask::InitTask()
  */
 void TelemetryTask::Run(void* pvParams)
 {
+	SendEOF();
     while (1) {
         //Process all commands in queue this cycle
         Command cm;
@@ -52,6 +54,16 @@ void TelemetryTask::Run(void* pvParams)
             HandleCommand(cm);
 
     }
+}
+
+/**
+ * @brief Sends and EOF command to the RCU
+ */
+
+void TelemetryTask::SendEOF()
+{
+	//RCU_LAST for the command message
+	SOBProtocolTask::Inst().SendRCUCommand(Proto::RCUCommand::Command::RCU_LAST);
 }
 
 /**
@@ -63,7 +75,7 @@ void TelemetryTask::HandleCommand(Command& cm)
     //Switch for the GLOBAL_COMMAND
     switch (cm.GetCommand()) {
     case TELEMETRY_SEND_DATA: {
-        RunLogSequence();
+    	RunLogSequence();
 	break;
     }
     case TELEMETRY_SEND_EOF: {
@@ -72,9 +84,10 @@ void TelemetryTask::HandleCommand(Command& cm)
      }
     case TELEMETRY_LOADCELL_EOF:
     case TELEMETRY_THERMOCOUPLE_EOF: {
-    	if(counter == 2)
+    	if(counter == 1)
     	{
     		SendEOF();
+    		counter = 0;
     	}
     	else
     	{
@@ -106,18 +119,4 @@ void TelemetryTask::RunLogSequence()
     ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_NEW_SAMPLE));
 	ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_TRANSMIT));
 
-}
-
-void TelemetryTask::SendEOF()
-{
-	//SOB_FAST_SAMPLE_IR for the command message
-	Proto::CommmandMessage dataEndMsg;
-	dataEndMsg.set_source(Proto::Node::NODE_SOB);
-	dataEndMsg.set_target(Proto::Node::NODE_RCU);
-	dataEndMsg.set_message_id((uint32_t)Proto::MessageID::MSG_COMMAND);
-
-	EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> dataEndWriteBuffer;
-	dataEndMsg.serialize(dataEndWriteBuffer);
-
-	SOBxProtocolTask::SendProtobufMessage(dataEndWriteBuffer, Proto::MessageID::MSG_COMMAND);
 }

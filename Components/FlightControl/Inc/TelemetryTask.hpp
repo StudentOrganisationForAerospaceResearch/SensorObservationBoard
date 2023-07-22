@@ -25,19 +25,21 @@ protected:
 
     void Run(void* pvParams); // Main run code
 
+    void SendEOF();
+
     void HandleCommand(Command& cm);
     void RunLogSequence();
 
 
 private:
+    // Private Variables
+	uint32_t loggingDelayMs;
+	uint32_t counter;
+
     // Private Functions
     TelemetryTask();        // Private constructor
     TelemetryTask(const TelemetryTask&);                        // Prevent copy-construction
     TelemetryTask& operator=(const TelemetryTask&);            // Prevent assignment
-
-    // Private Variables
-    uint32_t loggingDelayMs;
-    uint32_t counter;
 
 };
 
