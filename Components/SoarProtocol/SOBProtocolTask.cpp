@@ -34,7 +34,10 @@ void SOBProtocolTask::InitTask()
 /**
  * @brief Default constructor
  */
-SOBProtocolTask::SOBProtocolTask() : ProtocolTask(Proto::Node::NODE_SOB)
+SOBProtocolTask::SOBProtocolTask() : ProtocolTask(
+        Proto::Node::NODE_SOB,
+        UART::Protocol,
+        UART_TASK_COMMAND_SEND_PROTOCOL)
 {
 }
 

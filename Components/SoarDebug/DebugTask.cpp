@@ -31,24 +31,13 @@ constexpr uint8_t DEBUG_TASK_PERIOD = 100;
 /* Prototypes ----------------------------------------------------------------*/
 
 /* HAL Callbacks ----------------------------------------------------------------*/
-/**
- * @brief HAL Callback for DMA/Interrupt Complete
- *
- * TODO: This should eventually be in DMAController/main_avionics/UARTTask depending on how many tasks use DMA vs Interrupt vs Polling
- */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
-{
-	if (huart->Instance == SystemHandles::UART_Debug->Instance)
-		DebugTask::Inst().InterruptRxData();
-	else if(huart->Instance == SystemHandles::UART_Protocol->Instance)
-	    SOBProtocolTask::Inst().InterruptRxData();
-}
 
 /* Functions -----------------------------------------------------------------*/
 /**
  * @brief Constructor, sets all member variables
  */
-DebugTask::DebugTask() : Task(TASK_DEBUG_QUEUE_DEPTH_OBJS)
+DebugTask::DebugTask() : Task(TASK_DEBUG_QUEUE_DEPTH_OBJS),
+        kUart_(UART::Debug)
 {
 	memset(debugBuffer, 0, sizeof(debugBuffer));
 	debugMsgIdx = 0;
@@ -193,15 +182,14 @@ void DebugTask::HandleDebugMessage(const char* msg)
  */
 bool DebugTask::ReceiveData()
 {
-	HAL_UART_Receive_IT(SystemHandles::UART_Debug, &debugRxChar, 1);
-	return true;
+    return kUart_->ReceiveIT(&debugRxChar, this);
 }
 
 /**
  * @brief Receive data to the buffer
  * @return Whether the debugBuffer is ready or not
  */
-void DebugTask::InterruptRxData()
+void DebugTask::InterruptRxData(uint8_t errors)
 {
 	// If we already have an unprocessed debug message, ignore this byte
 	if (!isDebugMsgReady) {
