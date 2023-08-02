@@ -28,8 +28,8 @@
 
 #include "cmsis_os.h"	// CMSIS RTOS definitions
 #include "main_avionics.hpp"  // Main avionics definitions
-#include "stm32f4xx_hal.h"	 // HAL definitions
 #include "Utils.hpp"	// Utility functions
+#include "UARTDriver.hpp"
 
 /* Task Definitions ------------------------------------------------------------------*/
 /* - Lower priority number means lower priority task ---------------------------------*/
@@ -37,7 +37,7 @@
 // FLIGHT PHASE
 constexpr uint8_t FLIGHT_TASK_RTOS_PRIORITY = 2;			// Priority of the flight task
 constexpr uint8_t FLIGHT_TASK_QUEUE_DEPTH_OBJS = 10;		// Size of the flight task queue
-constexpr uint16_t FLIGHT_TASK_STACK_DEPTH_WORDS = 256;		// Size of the flight task stack
+constexpr uint16_t FLIGHT_TASK_STACK_DEPTH_WORDS = 512;		// Size of the flight task stack
 
 constexpr uint16_t FLIGHT_PHASE_DISPLAY_FREQ = 1000;	// Display frequency for flight phase information
 
@@ -90,7 +90,7 @@ constexpr uint16_t DEBUG_PRINT_MAX_SIZE = 192;			// Max size in bytes of message
 constexpr uint16_t ASSERT_BUFFER_MAX_SIZE = 160;		// Max size in bytes of assert buffers (assume x2 as we have two message segments)
 constexpr uint16_t ASSERT_SEND_MAX_TIME_MS = 250;		// Max time the assert fail is allowed to wait to send header and message to HAL (will take up to 2x this since it sends 2 segments)
 constexpr uint16_t ASSERT_TAKE_MAX_TIME_MS = 500;		// Max time in ms to take the assert semaphore
-constexpr UART_HandleTypeDef* const DEFAULT_ASSERT_UART_HANDLE = SystemHandles::UART_Debug;	// UART Handle that ASSERT messages are sent over
+constexpr UARTDriver* const DEFAULT_ASSERT_UART_DRIVER = UART::Debug;    // UART Handle that ASSERT messages are sent over
 
 /* System Functions ------------------------------------------------------------------*/
 //- Any system functions with an implementation here should be inline, and inline for a good reason (performance)
@@ -136,5 +136,8 @@ inline void soar_free(void* ptr) {
 
 
 /* Other ------------------------------------------------------------------*/
+// Override the new and delete operator to ensure heap4 is used for dynamic memory allocation
+inline void* operator new(size_t size) { return soar_malloc(size); }
+inline void operator delete(void* ptr) { soar_free(ptr); }
 
 #endif // SOAR_MAIN_SYSTEM_DEFINES_H
