@@ -169,8 +169,8 @@ void LoadCellTask::TransmitProtocolLoadCellData()
 {
     Proto::TelemetryMessage msg;
 	msg.set_source(Proto::Node::NODE_SOB);
-	msg.set_target(Proto::Node::NODE_DMB);
-//	msg.set_message_id((uint32_t)Proto::MessageID::MSG_TELEMETRY);
+	msg.set_target(Proto::Node::NODE_RCU);
+	msg.set_message_id((uint32_t)Proto::MessageID::MSG_TELEMETRY);
 
 	Proto::LRLoadCell loadCellSample;
 	loadCellSample.set_rocket_mass(rocket_mass_sample.weight_g);

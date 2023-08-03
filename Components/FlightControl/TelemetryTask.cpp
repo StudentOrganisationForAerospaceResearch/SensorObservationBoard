@@ -90,6 +90,4 @@ void TelemetryTask::RunLogSequence()
     // Thermocouple
     ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_NEW_SAMPLE));
 	ThermocoupleTask::Inst().SendCommand(Command(REQUEST_COMMAND, THERMOCOUPLE_REQUEST_TRANSMIT));
-
-    //TODO: Thermocouples
 }
