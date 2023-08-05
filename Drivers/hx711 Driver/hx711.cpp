@@ -136,7 +136,7 @@ float hx711_weight(hx711_t *hx711, uint16_t sample, uint32_t& ADCdata)
   uint32_t data = (int32_t)(ave / sample);
   float answer =  (data - hx711->offset) / hx711->coef;
   hx711_unlock(hx711);
-  return answer;
+  return ADCdata;
 }
 //#############################################################################################
 void hx711_coef_set(hx711_t *hx711, float coef)
