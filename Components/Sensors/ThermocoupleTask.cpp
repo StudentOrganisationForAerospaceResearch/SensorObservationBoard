@@ -141,11 +141,10 @@ void ThermocoupleTask::TransmitProtocolThermoData()
     Proto::TelemetryMessage msg;
     msg.set_source(Proto::Node::NODE_SOB);
     msg.set_target(Proto::Node::NODE_RCU);
-    msg.set_message_id((uint32_t)Proto::MessageID::MSG_TELEMETRY);
-    Proto::SOBTemp tempData;
-	tempData.set_tc1_temp(temperature1);
-	tempData.set_tc2_temp(temperature2);
-	msg.set_tempsob(tempData);
+    Proto::SobTemperature tempData;
+	tempData.set_tc1_temperature(temperature1);
+	tempData.set_tc2_temperature(temperature2);
+	msg.set_sobTemperature(tempData);
 
     EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> writeBuffer;
     msg.serialize(writeBuffer);

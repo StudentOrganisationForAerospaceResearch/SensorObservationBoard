@@ -59,12 +59,12 @@ void SOBProtocolTask::HandleProtobufCommandMessage(EmbeddedProto::ReadBufferFixe
     // Process the SOB command
     switch (msg.get_sob_command().get_command_enum())
     {
-    case Proto::SOBCommand::Command::SOB_TARE_LOAD_CELL: {
+    case Proto::SobCommand::Command::SOB_TARE_LOAD_CELL: {
         SOAR_PRINT("PROTO-INFO: Received SOB Tare Load Cell Command\n");
         LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, (uint16_t)LOADCELL_REQUEST_TARE));
         break;
     }
-    case Proto::SOBCommand::Command::SOB_CALIBRATE_LOAD_CELL: {
+    case Proto::SobCommand::Command::SOB_CALIBRATE_LOAD_CELL: {
         SOAR_PRINT("PROTO-INFO: Received SOB Calibrate Load Cell Command\n");
 
 		// update calibration mass directly
@@ -75,9 +75,9 @@ void SOBProtocolTask::HandleProtobufCommandMessage(EmbeddedProto::ReadBufferFixe
 		LoadCellTask::Inst().SendCommand(Command(REQUEST_COMMAND, LOADCELL_REQUEST_CALIBRATE));
 		break;
     }
-    case Proto::SOBCommand::Command::SOB_SLOW_SAMPLE_IR:
-    case Proto::SOBCommand::Command::SOB_FAST_SAMPLE_IR:
-    case Proto::SOBCommand::Command::SOB_LAST:
+    case Proto::SobCommand::Command::SOB_SLOW_SAMPLE_IR:
+    case Proto::SobCommand::Command::SOB_FAST_SAMPLE_IR:
+    case Proto::SobCommand::Command::SOB_LAST:
     default:
         break;
     }
