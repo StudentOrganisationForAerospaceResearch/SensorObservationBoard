@@ -30,9 +30,6 @@ namespace Global
 /* System Handles ------------------------------------------------------------------*/
 /* This should be the only place externs are allowed -------------------------------*/
 //UART Handles
-extern UART_HandleTypeDef huart1;   // UART1 - RS485 - HALF DUPLEX FOR NOW!! SCHEMATIC WRONG NAME
-extern UART_HandleTypeDef huart5;   // UART5 - Debug
-
 
 //I2C Handles
 extern I2C_HandleTypeDef hi2c1;      // I2C1 -- Infrared Temperature Sensor
@@ -48,9 +45,6 @@ extern DMA_HandleTypeDef hdma_uart5_tx; // DMA UART 5 TX -
 
 namespace SystemHandles {
 	// Aliases
-	constexpr UART_HandleTypeDef* UART_Protocol = &huart1;
-	constexpr UART_HandleTypeDef* UART_Debug = &huart5;
-
 	constexpr SPI_HandleTypeDef* SPI_Thermocouple = &hspi3;
 
 	constexpr I2C_HandleTypeDef* I2C_IR = &hi2c1;
