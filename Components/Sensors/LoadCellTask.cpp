@@ -173,7 +173,7 @@ void LoadCellTask::TransmitProtocolLoadCellData()
 
 	Proto::LaunchRailLoadCell loadCellSample;
 	loadCellSample.set_rocket_mass(rocket_mass_sample.weight_g);
-	msg.launchRailLoadCell(loadCellSample);
+	msg.set_launchRailLoadCell(loadCellSample);
 
 	EmbeddedProto::WriteBufferFixedSize<DEFAULT_PROTOCOL_WRITE_BUFFER_SIZE> writeBuffer;
 	msg.serialize(writeBuffer);
